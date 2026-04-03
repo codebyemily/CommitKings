@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { type FormEvent, useState } from 'react'
 
 export function LoginForm() {
@@ -44,17 +45,17 @@ export function LoginForm() {
         </button>
       </form>
 
-      <button type="button" className="auth-link forgot">
+      <Link className="auth-link forgot" href="/forgot-password">
         Forgot Password?
-      </button>
+      </Link>
 
       <div className="auth-divider" role="separator" />
 
       <p className="auth-footer">
         Don&apos;t have an account?{' '}
-        <button type="button" className="auth-link auth-link-inline">
+        <Link className="auth-link auth-link-inline" href="/signup">
           Sign Up
-        </button>
+        </Link>
       </p>
     </>
   )

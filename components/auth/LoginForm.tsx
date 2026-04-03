@@ -45,9 +45,9 @@ export function LoginForm() {
         </button>
       </form>
 
-      <button type="button" className="auth-link forgot">
+      <Link className="auth-link forgot" href="/forgot-password">
         Forgot Password?
-      </button>
+      </Link>
 
       <div className="auth-divider" role="separator" />
 

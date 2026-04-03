@@ -33,7 +33,7 @@ export function ForgotPasswordForm() {
 
       <div className="auth-divider" role="separator" />
 
-      <Link className="auth-link auth-back-link" href="/login">
+      <Link className="auth-link" href="/login">
         Back to Login
       </Link>
     </>

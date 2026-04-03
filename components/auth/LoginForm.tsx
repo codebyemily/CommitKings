@@ -1,30 +1,55 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { type FormEvent, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { getAuthErrorMessage } from '@/lib/auth-errors'
 
 export function LoginForm() {
-  const [emailOrUsername, setEmailOrUsername] = useState('')
+  const router = useRouter()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    setError(null)
+    setLoading(true)
+
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    })
+
+    setLoading(false)
+
+    if (signInError) {
+      setError(getAuthErrorMessage(signInError.message))
+      return
+    }
+
+    router.push('/home')
+    router.refresh()
   }
 
   return (
     <>
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <label className="sr-only" htmlFor="email-or-username">
-          Email or Username
+        <label className="sr-only" htmlFor="email">
+          Email
         </label>
         <input
-          id="email-or-username"
-          name="emailOrUsername"
-          type="text"
-          autoComplete="username"
-          placeholder="Email or Username"
-          value={emailOrUsername}
-          onChange={(e) => setEmailOrUsername(e.target.value)}
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
 
         <label className="sr-only" htmlFor="password">
@@ -38,10 +63,13 @@ export function LoginForm() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
 
-        <button type="submit" className="auth-submit">
-          Log In
+        {error ? <p className="auth-error">{error}</p> : null}
+
+        <button type="submit" className="auth-submit" disabled={loading}>
+          {loading ? 'Signing in…' : 'Log In'}
         </button>
       </form>
 

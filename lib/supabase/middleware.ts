@@ -8,7 +8,21 @@ function getAnonKey() {
   )
 }
 
-/** Refreshes the user session and syncs auth cookies (run from root middleware). */
+/** Routes that show login/signup; logged-in users are sent to /home */
+const AUTH_SCREEN_ROUTES = new Set([
+  '/',
+  '/login',
+  '/signup',
+  '/forgot-password',
+])
+
+function copyCookies(from: NextResponse, to: NextResponse) {
+  from.cookies.getAll().forEach(({ name, value }) => {
+    to.cookies.set(name, value)
+  })
+}
+
+/** Refreshes the session, then enforces auth redirects for /home vs login routes. */
 export async function updateSession(request: NextRequest) {
   const supabaseResponse = NextResponse.next({
     request,
@@ -33,7 +47,27 @@ export async function updateSession(request: NextRequest) {
     },
   })
 
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const pathname = request.nextUrl.pathname
+
+  if (!user && pathname.startsWith('/home')) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/login'
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    copyCookies(supabaseResponse, redirectResponse)
+    return redirectResponse
+  }
+
+  if (user && AUTH_SCREEN_ROUTES.has(pathname)) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/home'
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    copyCookies(supabaseResponse, redirectResponse)
+    return redirectResponse
+  }
 
   return supabaseResponse
 }

@@ -18,6 +18,7 @@ body {
   min-height: 100svh;
 }
 
+/* Login (auth) */
 .auth-root {
   --auth-bg: #f8f9fa;
   --auth-text: #000000;
@@ -76,6 +77,7 @@ body {
   border: 1px solid var(--auth-border);
   border-radius: 8px;
   outline: none;
+  text-align: left;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -134,7 +136,8 @@ button.auth-link {
   text-align: center;
 }
 
-button.auth-link.forgot {
+.auth-link.forgot {
+  display: inline-block;
   margin-bottom: 24px;
 }
 

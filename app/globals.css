@@ -163,6 +163,12 @@ button.auth-link:hover {
   color: var(--auth-footer-text);
 }
 
+.auth-back-link {
+  display: inline-block;
+  margin-top: 0;
+  font-size: 0.9375rem;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

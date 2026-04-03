@@ -18,6 +18,7 @@ body {
   min-height: 100svh;
 }
 
+/* Login (auth) */
 .auth-root {
   --auth-bg: #f8f9fa;
   --auth-text: #000000;

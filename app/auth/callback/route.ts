@@ -8,11 +8,19 @@ function getAnonKey() {
   )
 }
 
-/** PKCE / OAuth callback — exchanges code for session and redirects to /home */
+/** Only allow same-origin path redirects (no open redirects). */
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) {
+    return '/home'
+  }
+  return raw
+}
+
+/** PKCE / OAuth callback — exchanges code for session and redirects to `next` */
 export async function GET(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = getAnonKey()
-  const next = request.nextUrl.searchParams.get('next') ?? '/home'
+  const next = safeNextPath(request.nextUrl.searchParams.get('next'))
 
   if (!url || !key) {
     return NextResponse.redirect(new URL('/login', request.url))

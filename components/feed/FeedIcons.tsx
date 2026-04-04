@@ -147,7 +147,11 @@ export function IconCreate({ className, title }: IconProps) {
   )
 }
 
-export function IconMessages({ className, title }: IconProps) {
+export function IconMessages({
+  className,
+  title,
+  active,
+}: IconProps & { active?: boolean }) {
   return (
     <svg
       className={className}
@@ -156,7 +160,7 @@ export function IconMessages({ className, title }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2}
+      strokeWidth={active ? 2.5 : 2}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden={title ? undefined : true}

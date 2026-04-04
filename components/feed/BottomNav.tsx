@@ -13,6 +13,7 @@ import {
 export function BottomNav() {
   const pathname = usePathname()
   const homeActive = pathname === '/home'
+  const messagesActive = pathname === '/messages'
 
   return (
     <nav className="feed-bottom-nav" aria-label="Primary">
@@ -30,9 +31,14 @@ export function BottomNav() {
       <button type="button" className="feed-nav-item" aria-label="Create (coming soon)">
         <IconCreate title="Create" />
       </button>
-      <button type="button" className="feed-nav-item" aria-label="Messages (coming soon)">
-        <IconMessages title="Messages" />
-      </button>
+      <Link
+        href="/messages"
+        className="feed-nav-item"
+        aria-label="Messages"
+        aria-current={messagesActive ? 'page' : undefined}
+      >
+        <IconMessages active={messagesActive} title="Messages" />
+      </Link>
       <button type="button" className="feed-nav-item" aria-label="Profile (coming soon)">
         <IconProfile title="Profile" />
       </button>

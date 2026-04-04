@@ -303,6 +303,40 @@ button.auth-link:hover {
   text-align: center;
 }
 
+.feed-search-wrap {
+  padding: 12px 16px 24px;
+}
+
+.feed-search-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  line-height: 1.4;
+  font-family: inherit;
+  color: var(--feed-text);
+  background: #fafafa;
+  border: 1px solid var(--feed-border);
+  border-radius: 8px;
+  outline: none;
+}
+
+.feed-search-input::placeholder {
+  color: var(--feed-muted);
+}
+
+.feed-search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.feed-search-hint {
+  margin: 16px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--feed-muted);
+  text-align: center;
+}
+
 .feed-post {
   border-bottom: 1px solid var(--feed-border);
 }

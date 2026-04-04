@@ -56,6 +56,7 @@ export async function updateSession(request: NextRequest) {
   if (
     !user &&
     (pathname.startsWith('/home') ||
+      pathname === '/search' ||
       pathname === '/messages' ||
       pathname === '/profile' ||
       pathname === '/activity')

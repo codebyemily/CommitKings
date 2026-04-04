@@ -13,6 +13,7 @@ import {
 export function BottomNav() {
   const pathname = usePathname()
   const homeActive = pathname === '/home'
+  const searchActive = pathname === '/search'
   const messagesActive = pathname === '/messages'
   const profileActive = pathname === '/profile'
 
@@ -26,9 +27,14 @@ export function BottomNav() {
       >
         <IconHome active={homeActive} title="Home" />
       </Link>
-      <button type="button" className="feed-nav-item" aria-label="Search (coming soon)">
-        <IconSearch title="Search" />
-      </button>
+      <Link
+        href="/search"
+        className="feed-nav-item"
+        aria-label="Search"
+        aria-current={searchActive ? 'page' : undefined}
+      >
+        <IconSearch active={searchActive} title="Search" />
+      </Link>
       <button type="button" className="feed-nav-item" aria-label="Create (coming soon)">
         <IconCreate title="Create" />
       </button>

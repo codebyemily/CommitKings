@@ -1,4 +1,3 @@
-import { SignOutButton } from '@/components/auth/SignOutButton'
 import { IconHeart } from './FeedIcons'
 
 export function FeedHeader() {
@@ -16,7 +15,6 @@ export function FeedHeader() {
             2
           </span>
         </button>
-        <SignOutButton className="feed-sign-out" />
       </div>
     </header>
   )

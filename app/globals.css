@@ -235,6 +235,10 @@ button.auth-link:hover {
   gap: 8px;
 }
 
+.feed-header-actions a.feed-icon-btn {
+  text-decoration: none;
+}
+
 .feed-icon-btn {
   display: inline-flex;
   align-items: center;

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { IconHeart } from './FeedIcons'
 
 export function FeedHeader() {
@@ -5,16 +6,16 @@ export function FeedHeader() {
     <header className="feed-header">
       <h1 className="feed-logo">Forum Neighborhood</h1>
       <div className="feed-header-actions">
-        <button
-          type="button"
+        <Link
+          href="/following"
           className="feed-icon-btn feed-notifications"
-          aria-label="Notifications, 2 unread"
+          aria-label="Following list and activity, 2 unread"
         >
-          <IconHeart className="feed-icon-stroke" title="Activity" />
+          <IconHeart className="feed-icon-stroke" title="Following" />
           <span className="feed-notify-badge" aria-hidden>
             2
           </span>
-        </button>
+        </Link>
       </div>
     </header>
   )

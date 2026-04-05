@@ -59,7 +59,8 @@ export async function updateSession(request: NextRequest) {
       pathname === '/search' ||
       pathname === '/messages' ||
       pathname === '/profile' ||
-      pathname === '/activity')
+      pathname === '/activity' ||
+      pathname === '/following')
   ) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'

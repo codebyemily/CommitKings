@@ -60,7 +60,8 @@ export async function updateSession(request: NextRequest) {
       pathname === '/messages' ||
       pathname === '/profile' ||
       pathname === '/activity' ||
-      pathname === '/following')
+      pathname === '/following' ||
+      pathname === '/create')
   ) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'

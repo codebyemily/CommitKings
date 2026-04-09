@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { HomeFeed } from '@/components/feed/HomeFeed'
-import { getFeedPosts } from '@/lib/data/feed'
+import { CreatePostScreen } from '@/components/feed/CreatePostScreen'
 
 export const metadata: Metadata = {
-  title: 'Home',
+  title: 'New post',
 }
 
-export default async function HomePage() {
+export default async function CreatePostPage() {
   const supabase = await createClient()
   const {
     data: { user },
@@ -18,7 +17,5 @@ export default async function HomePage() {
     redirect('/login')
   }
 
-  const posts = await getFeedPosts()
-
-  return <HomeFeed posts={posts} />
+  return <CreatePostScreen />
 }

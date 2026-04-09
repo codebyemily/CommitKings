@@ -1,5 +1,7 @@
 'use client'
 
+import { createPostAction } from '@/app/actions/posts'
+import { useRouter } from 'next/navigation'
 import {
   type ChangeEvent,
   type FormEvent,
@@ -11,6 +13,7 @@ import {
 } from 'react'
 
 export function CreatePostForm() {
+  const router = useRouter()
   const galleryInputId = useId()
   const fallbackCameraInputId = useId()
   const galleryRef = useRef<HTMLInputElement>(null)
@@ -19,8 +22,10 @@ export function CreatePostForm() {
   const streamRef = useRef<MediaStream | null>(null)
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [caption, setCaption] = useState('')
-  const [hint, setHint] = useState<string | null>(null)
+  const [postError, setPostError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
   const [cameraOpen, setCameraOpen] = useState(false)
   const [cameraReady, setCameraReady] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
@@ -117,11 +122,13 @@ export function CreatePostForm() {
       (blob) => {
         if (!blob) return
         stopCamera()
+        const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' })
+        setUploadFile(file)
         setPreviewUrl((prev) => {
           revokePreview(prev)
           return URL.createObjectURL(blob)
         })
-        setHint(null)
+        setPostError(null)
         setCameraError(null)
       },
       'image/jpeg',
@@ -133,29 +140,41 @@ export function CreatePostForm() {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file || !file.type.startsWith('image/')) return
+    setUploadFile(file)
     setPreviewUrl((prev) => {
       revokePreview(prev)
       return URL.createObjectURL(file)
     })
-    setHint(null)
+    setPostError(null)
     setCameraError(null)
   }
 
   function clearPhoto() {
+    setUploadFile(null)
     setPreviewUrl((prev) => {
       revokePreview(prev)
       return null
     })
     setCaption('')
-    setHint(null)
+    setPostError(null)
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!previewUrl) return
-    setHint(
-      'Preview only—connect your backend to upload posts. Your caption is not saved.',
-    )
+    if (!uploadFile) return
+    setSubmitting(true)
+    setPostError(null)
+    const fd = new FormData()
+    fd.append('image', uploadFile)
+    fd.append('caption', caption)
+    const result = await createPostAction(fd)
+    setSubmitting(false)
+    if (result.ok) {
+      router.push('/home')
+      router.refresh()
+      return
+    }
+    setPostError(result.error)
   }
 
   return (
@@ -273,14 +292,14 @@ export function CreatePostForm() {
           onChange={(e) => setCaption(e.target.value)}
         />
 
-        {hint ? <p className="create-post-hint">{hint}</p> : null}
+        {postError ? <p className="create-post-submit-error">{postError}</p> : null}
 
         <button
           type="submit"
           className="create-post-submit"
-          disabled={!previewUrl}
+          disabled={!uploadFile || submitting}
         >
-          Share post
+          {submitting ? 'Posting…' : 'Share post'}
         </button>
       </form>
     </>

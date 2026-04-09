@@ -364,6 +364,18 @@ button.auth-link:hover {
   object-fit: cover;
 }
 
+.feed-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(145deg, #3b82f6, #6366f1);
+}
+
 .feed-username {
   font-size: 0.875rem;
   font-weight: 600;
@@ -1120,6 +1132,13 @@ html[data-theme='dark'] .create-post-preview-wrap {
   font-size: 0.8125rem;
   line-height: 1.45;
   color: var(--feed-muted);
+}
+
+.create-post-submit-error {
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #b91c1c;
 }
 
 .create-post-submit {

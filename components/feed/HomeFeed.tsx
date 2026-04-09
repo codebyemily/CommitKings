@@ -2,10 +2,11 @@ import { FeedHeader } from './FeedHeader'
 import { BottomNav } from './BottomNav'
 import { FeedPost, type FeedPostData } from './FeedPost'
 
-/** Populated from your backend when real posts exist. */
-const posts: FeedPostData[] = []
+type HomeFeedProps = {
+  posts: FeedPostData[]
+}
 
-export function HomeFeed() {
+export function HomeFeed({ posts }: HomeFeedProps) {
   return (
     <div className="feed-app">
       <FeedHeader />

@@ -16,6 +16,8 @@ export type FeedPostData = {
   /** If set, show the top row (avatar + username + time). */
   timeAgo?: string
   avatarSrc?: string
+  /** Prefer LCP for the first image in the feed. */
+  imagePriority?: boolean
 }
 
 export function FeedPost({
@@ -26,21 +28,28 @@ export function FeedPost({
   caption,
   timeAgo,
   avatarSrc,
+  imagePriority,
 }: FeedPostData) {
-  const showHeader = Boolean(timeAgo && avatarSrc)
+  const showHeader = Boolean(timeAgo)
 
   return (
     <article className="feed-post">
       {showHeader ? (
         <div className="feed-post-header">
           <div className="feed-post-user">
-            <Image
-              src={avatarSrc!}
-              alt=""
-              width={32}
-              height={32}
-              className="feed-avatar"
-            />
+            {avatarSrc ? (
+              <Image
+                src={avatarSrc}
+                alt=""
+                width={32}
+                height={32}
+                className="feed-avatar"
+              />
+            ) : (
+              <span className="feed-avatar feed-avatar-fallback" aria-hidden>
+                {username.charAt(0).toUpperCase()}
+              </span>
+            )}
             <span className="feed-username">{username}</span>
           </div>
           <span className="feed-time">{timeAgo}</span>
@@ -54,7 +63,7 @@ export function FeedPost({
           fill
           sizes="100vw"
           className="feed-post-image"
-          priority={!showHeader}
+          priority={imagePriority ?? false}
         />
       </div>
 
@@ -76,7 +85,9 @@ export function FeedPost({
           </button>
         </div>
 
-        <p className="feed-likes">{likes.toLocaleString()} likes</p>
+        <p className="feed-likes">
+          {likes === 1 ? '1 like' : `${likes.toLocaleString()} likes`}
+        </p>
 
         <p className="feed-caption">
           <span className="feed-username feed-caption-user">{username}</span>{' '}

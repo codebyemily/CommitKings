@@ -10,7 +10,7 @@ export function CreatePostScreen() {
         <div className="activity-main">
           <h2 className="activity-title">New post</h2>
           <p className="activity-intro">
-            Add an image, then share when your upload API is ready.
+            Add a photo and caption—your post will show on everyone&apos;s home feed.
           </p>
         </div>
         <CreatePostForm />

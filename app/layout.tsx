@@ -7,10 +7,7 @@ export const metadata: Metadata = {
     template: '%s · Forum Neighborhood',
   },
   description: 'Forum Neighborhood app',
-  icons: {
-    icon: [{ url: '/1058031.svg', type: 'image/svg+xml' }],
-    apple: '/1058031.svg',
-  },
+  icons: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
 }
 
 export default function RootLayout({

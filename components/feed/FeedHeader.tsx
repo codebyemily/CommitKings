@@ -8,13 +8,10 @@ export function FeedHeader() {
       <div className="feed-header-actions">
         <Link
           href="/following"
-          className="feed-icon-btn feed-notifications"
-          aria-label="Following list and activity, 2 unread"
+          className="feed-icon-btn"
+          aria-label="Following"
         >
           <IconHeart className="feed-icon-stroke" title="Following" />
-          <span className="feed-notify-badge" aria-hidden>
-            2
-          </span>
         </Link>
       </div>
     </header>

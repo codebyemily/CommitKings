@@ -16,6 +16,7 @@ export function BottomNav() {
   const searchActive = pathname === '/search'
   const messagesActive = pathname === '/messages'
   const profileActive = pathname === '/profile'
+  const createActive = pathname === '/create'
 
   return (
     <nav className="feed-bottom-nav" aria-label="Primary">
@@ -35,9 +36,14 @@ export function BottomNav() {
       >
         <IconSearch active={searchActive} title="Search" />
       </Link>
-      <button type="button" className="feed-nav-item" aria-label="Create (coming soon)">
-        <IconCreate title="Create" />
-      </button>
+      <Link
+        href="/create"
+        className="feed-nav-item"
+        aria-label="New post"
+        aria-current={createActive ? 'page' : undefined}
+      >
+        <IconCreate active={createActive} title="Create" />
+      </Link>
       <Link
         href="/messages"
         className="feed-nav-item"

@@ -4,11 +4,19 @@ import { isMissingAuthorAvatarPathColumn } from '@/lib/posts/schema-fallback'
 import { formatPostTime } from '@/lib/posts/time'
 import type { FeedPostData } from '@/components/feed/FeedPost'
 
+/** When set, your own posts use this storage path if the row has no `author_avatar_path` yet. */
+export type FeedViewerContext = {
+  userId: string
+  avatarStoragePath: string | null
+}
+
 const POSTS_SELECT_BASE =
-  'id, caption, image_path, created_at, author_username, likes_count'
+  'id, user_id, caption, image_path, created_at, author_username, likes_count'
 const POSTS_SELECT_WITH_AVATAR = `${POSTS_SELECT_BASE}, author_avatar_path`
 
-export async function getFeedPosts(): Promise<FeedPostData[]> {
+export async function getFeedPosts(
+  viewer?: FeedViewerContext | null,
+): Promise<FeedPostData[]> {
   const supabase = await createClient()
 
   let { data, error } = await supabase
@@ -35,10 +43,17 @@ export async function getFeedPosts(): Promise<FeedPostData[]> {
   if (!data?.length) return []
 
   return data.map((row, index) => {
-    const path =
+    let path =
       'author_avatar_path' in row && row.author_avatar_path
         ? String(row.author_avatar_path).trim()
         : ''
+    if (
+      !path &&
+      viewer?.avatarStoragePath &&
+      row.user_id === viewer.userId
+    ) {
+      path = viewer.avatarStoragePath
+    }
     return {
       id: row.id,
       username: row.author_username,

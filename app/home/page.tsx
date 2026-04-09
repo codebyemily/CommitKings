@@ -18,7 +18,13 @@ export default async function HomePage() {
     redirect('/login')
   }
 
-  const posts = await getFeedPosts()
+  const meta = user.user_metadata as Record<string, unknown>
+  const avatarPathRaw =
+    typeof meta.avatar_path === 'string' ? meta.avatar_path.trim() : ''
+  const posts = await getFeedPosts({
+    userId: user.id,
+    avatarStoragePath: avatarPathRaw || null,
+  })
 
   return <HomeFeed posts={posts} />
 }

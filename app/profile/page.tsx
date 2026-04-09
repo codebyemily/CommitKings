@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { getPostImagePublicUrl } from '@/lib/posts/public-url'
 import { redirect } from 'next/navigation'
 import { ProfileScreen } from '@/components/profile/ProfileScreen'
 
@@ -30,11 +31,19 @@ export default async function ProfilePage() {
     user.email?.split('@')[0] ||
     'user'
 
+  const bio = typeof meta?.bio === 'string' ? meta.bio : ''
+
+  const avatarPathRaw =
+    typeof meta?.avatar_path === 'string' ? meta.avatar_path.trim() : ''
+  const avatarUrl = avatarPathRaw ? getPostImagePublicUrl(avatarPathRaw) : null
+
   return (
     <ProfileScreen
       email={user.email ?? ''}
       displayName={displayName}
       handle={handle}
+      bio={bio}
+      avatarUrl={avatarUrl}
     />
   )
 }

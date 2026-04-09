@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { isMissingAuthorAvatarPathColumn } from '@/lib/posts/schema-fallback'
 import { revalidatePath } from 'next/cache'
 
 const MAX_BYTES = 10 * 1024 * 1024
@@ -50,6 +51,11 @@ export async function createPostAction(formData: FormData): Promise<CreatePostRe
     (typeof meta?.display_name === 'string' && meta.display_name.trim()) ||
     username
 
+  const authorAvatarPath =
+    typeof meta?.avatar_path === 'string' && meta.avatar_path.trim()
+      ? meta.avatar_path.trim()
+      : null
+
   const ext =
     file.type === 'image/png'
       ? 'png'
@@ -69,13 +75,31 @@ export async function createPostAction(formData: FormData): Promise<CreatePostRe
     return { ok: false, error: uploadError.message }
   }
 
-  const { error: insertError } = await supabase.from('posts').insert({
+  const rowWithAvatar = {
     user_id: user.id,
     image_path: path,
     caption,
     author_username: username,
     author_display_name: displayName,
-  })
+    author_avatar_path: authorAvatarPath,
+  }
+  const rowWithoutAvatar = {
+    user_id: user.id,
+    image_path: path,
+    caption,
+    author_username: username,
+    author_display_name: displayName,
+  }
+
+  let { error: insertError } = await supabase.from('posts').insert(rowWithAvatar)
+
+  if (
+    insertError &&
+    isMissingAuthorAvatarPathColumn(insertError.message)
+  ) {
+    const retry = await supabase.from('posts').insert(rowWithoutAvatar)
+    insertError = retry.error
+  }
 
   if (insertError) {
     await supabase.storage.from('post-images').remove([path])

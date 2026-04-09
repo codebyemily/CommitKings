@@ -9,6 +9,15 @@ try {
 }
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/favicon.ico',
+        destination: '/1058031.svg',
+        permanent: true,
+      },
+    ]
+  },
   images: {
     remotePatterns: [
       ...(supabaseHost

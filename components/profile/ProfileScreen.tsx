@@ -1,14 +1,18 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { FeedHeader } from '@/components/feed/FeedHeader'
 import { BottomNav } from '@/components/feed/BottomNav'
 import { SignOutButton } from '@/components/auth/SignOutButton'
 import { ProfileAppearance } from './ProfileAppearance'
 import { ProfileNotificationsToggle } from './ProfileNotificationsToggle'
+import { ProfileEditButton } from './ProfileEditButton'
 
 type ProfileScreenProps = {
   email: string
   displayName: string
   handle: string
+  bio: string
+  avatarUrl: string | null
 }
 
 const ANALYTICS_LINKS = [
@@ -22,23 +26,49 @@ export function ProfileScreen({
   email,
   displayName,
   handle,
+  bio,
+  avatarUrl,
 }: ProfileScreenProps) {
   const initial = displayName.charAt(0).toUpperCase() || email.charAt(0).toUpperCase() || '?'
+  const bioText = bio.trim()
 
   return (
     <div className="feed-app">
       <FeedHeader />
       <main className="feed-main profile-scroll">
         <section className="profile-hero">
-          <div className="profile-avatar" aria-hidden>
-            {initial}
+          <div
+            className={
+              avatarUrl ? 'profile-avatar profile-avatar--photo' : 'profile-avatar'
+            }
+            aria-hidden
+          >
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt=""
+                width={88}
+                height={88}
+                className="profile-avatar-image"
+                priority
+              />
+            ) : (
+              <span className="profile-avatar-letter">{initial}</span>
+            )}
           </div>
           <h2 className="profile-name">{displayName}</h2>
           <p className="profile-handle">@{handle}</p>
-          <p className="profile-bio">Tell people a little about you—this can connect to your profile later.</p>
-          <button type="button" className="profile-edit-btn" disabled>
-            Edit profile
-          </button>
+          <p className="profile-bio">
+            {bioText
+              ? bioText
+              : 'Add a short bio—tap Edit profile to tell people about you.'}
+          </p>
+          <ProfileEditButton
+            initialDisplayName={displayName}
+            initialUsername={handle}
+            initialBio={bio}
+            initialAvatarUrl={avatarUrl}
+          />
         </section>
 
         <section className="profile-card">

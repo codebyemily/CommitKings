@@ -192,7 +192,7 @@ button.auth-link:hover {
 
 /* Home feed (mobile-first, Instagram-style) */
 .feed-app {
-  --feed-header-h: 52px;
+  --feed-header-h: 56px;
   --feed-nav-h: 56px;
   --feed-text: #000000;
   --feed-muted: #8e8e8e;
@@ -218,21 +218,69 @@ button.auth-link:hover {
   min-height: var(--feed-header-h);
   padding: 8px 16px;
   padding-top: max(8px, env(safe-area-inset-top));
+  padding-bottom: 12px;
+  padding-left: max(0px, env(safe-area-inset-left));
   background: var(--feed-bg);
   border-bottom: 1px solid var(--feed-border);
 }
 
-.feed-logo {
+.feed-logo-heading {
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  line-height: 0;
+  font-size: 0;
+  display: flex;
+  align-items: center;
+}
+
+.feed-logo-link {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.site-logo {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.site-logo--header {
+  height: 36px;
+  width: 36px;
+  max-height: 36px;
+  max-width: min(120px, 36vw);
+}
+
+.site-logo--auth {
+  display: block;
+  max-height: clamp(64px, 22vw, 120px);
+  width: auto;
+  max-width: min(280px, 88vw);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.auth-logo-heading {
+  margin: 0 0 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 0;
+  font-size: 0;
 }
 
 .feed-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Header only — slightly larger than 24px post actions to balance the logo */
+.feed-header .feed-icon-stroke {
+  width: 28px;
+  height: 28px;
 }
 
 .feed-header-actions a.feed-icon-btn {
@@ -259,26 +307,6 @@ button.auth-link:hover {
 
 .feed-icon-stroke {
   display: block;
-}
-
-.feed-notifications {
-  position: relative;
-}
-
-.feed-notify-badge {
-  position: absolute;
-  top: 4px;
-  right: 2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 18px;
-  color: #ffffff;
-  text-align: center;
-  background: #ed4956;
-  border-radius: 999px;
 }
 
 .feed-main {

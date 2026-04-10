@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { OneSignalProvider } from '@/components/push/OneSignalProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -21,10 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <OneSignalProvider />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   )
 }

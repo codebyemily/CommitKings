@@ -9,6 +9,7 @@ export type FeedPostData = {
   likes: number
   commentsCount: number
   likedByViewer: boolean
+  savedByViewer: boolean
   caption: string
   /** If set, show the top row (avatar + username + time). */
   timeAgo?: string
@@ -25,6 +26,7 @@ export function FeedPost({
   likes,
   commentsCount,
   likedByViewer,
+  savedByViewer,
   caption,
   timeAgo,
   avatarSrc,
@@ -74,6 +76,7 @@ export function FeedPost({
         imageSrc={imageSrc}
         initialLikesCount={likes}
         initialLiked={likedByViewer}
+        initialSaved={savedByViewer}
         initialCommentsCount={commentsCount}
       />
     </article>

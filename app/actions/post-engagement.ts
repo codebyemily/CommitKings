@@ -21,6 +21,10 @@ export type AddCommentResult =
     }
   | { ok: false; error: string }
 
+export type ToggleSaveResult =
+  | { ok: true; saved: boolean }
+  | { ok: false; error: string }
+
 export async function togglePostLikeAction(postId: string): Promise<ToggleLikeResult> {
   const trimmed = postId.trim()
   if (!trimmed) {
@@ -164,4 +168,59 @@ export async function addPostCommentAction(
       author_display_name: row.author_display_name,
     },
   }
+}
+
+export async function togglePostSaveAction(postId: string): Promise<ToggleSaveResult> {
+  const trimmed = postId.trim()
+  if (!trimmed) {
+    return { ok: false, error: 'Invalid post.' }
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { ok: false, error: 'You must be signed in.' }
+  }
+
+  const { data: existing, error: existingError } = await supabase
+    .from('post_saves')
+    .select('post_id')
+    .eq('post_id', trimmed)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (existingError) {
+    return {
+      ok: false,
+      error: engagementSchemaErrorMessage(existingError.message),
+    }
+  }
+
+  if (existing) {
+    const { error: delError } = await supabase
+      .from('post_saves')
+      .delete()
+      .eq('post_id', trimmed)
+      .eq('user_id', user.id)
+
+    if (delError) {
+      return { ok: false, error: engagementSchemaErrorMessage(delError.message) }
+    }
+  } else {
+    const { error: insError } = await supabase.from('post_saves').insert({
+      post_id: trimmed,
+      user_id: user.id,
+    })
+
+    if (insError) {
+      return { ok: false, error: engagementSchemaErrorMessage(insError.message) }
+    }
+  }
+
+  revalidatePath('/home')
+  revalidatePath('/activity?tab=saved')
+  return { ok: true, saved: !existing }
 }

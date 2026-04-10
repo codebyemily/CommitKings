@@ -1755,12 +1755,9 @@ html[data-theme="dark"] .activity-tab-active {
 }
 
 .activity-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: min(240px, 40svh);
-  padding: 24px 16px;
-  border: 1px dashed var(--feed-border);
+  padding: 12px;
+  border: 1px solid var(--feed-border);
   border-radius: 12px;
 }
 
@@ -1769,6 +1766,47 @@ html[data-theme="dark"] .activity-tab-active {
   font-size: 0.9375rem;
   color: var(--feed-muted);
   text-align: center;
+}
+
+.activity-post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.activity-post-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--feed-border);
+}
+
+.activity-post-thumb {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.activity-post-copy {
+  min-width: 0;
+}
+
+.activity-post-caption {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.activity-post-user {
+  font-weight: 600;
+}
+
+.activity-post-time {
+  margin-top: 4px;
+  display: block;
+  font-size: 0.75rem;
+  color: var(--feed-muted);
 }
 
 .profile-row {

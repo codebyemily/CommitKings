@@ -45,12 +45,26 @@ export function isMissingPostCommentsTable(message: string): boolean {
   )
 }
 
+export function isMissingPostSavesTable(message: string): boolean {
+  const m = message.toLowerCase()
+  if (!m.includes('post_saves')) return false
+  return (
+    m.includes('does not exist') ||
+    m.includes('schema cache') ||
+    m.includes('could not find')
+  )
+}
+
 const LIKES_COMMENTS_MIGRATION = '20260410140000_post_likes_and_comments.sql'
 
-/** User-facing hint when likes/comments tables are missing from the remote DB. */
+/** User-facing hint when engagement tables are missing from the remote DB. */
 export function engagementSchemaErrorMessage(raw: string): string {
-  if (isMissingPostLikesTable(raw) || isMissingPostCommentsTable(raw)) {
-    return `Likes and comments need the latest database migration. Run ${LIKES_COMMENTS_MIGRATION} on your Supabase project (Dashboard → SQL Editor, or \`supabase db push\` from this repo), then reload the page.`
+  if (
+    isMissingPostLikesTable(raw) ||
+    isMissingPostCommentsTable(raw) ||
+    isMissingPostSavesTable(raw)
+  ) {
+    return `Post engagement tables are out of date. Run ${LIKES_COMMENTS_MIGRATION} and 20260410170000_post_saves.sql on your Supabase project (Dashboard → SQL Editor, or \`supabase db push\` from this repo), then reload the page.`
   }
   return raw
 }

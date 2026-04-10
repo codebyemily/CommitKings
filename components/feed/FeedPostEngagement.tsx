@@ -2,6 +2,7 @@
 
 import {
   addPostCommentAction,
+  togglePostSaveAction,
   togglePostLikeAction,
 } from '@/app/actions/post-engagement'
 import {
@@ -35,6 +36,7 @@ type Props = {
   imageSrc: string
   initialLikesCount: number
   initialLiked: boolean
+  initialSaved: boolean
   initialCommentsCount: number
 }
 
@@ -68,19 +70,23 @@ export function FeedPostEngagement({
   imageSrc,
   initialLikesCount,
   initialLiked,
+  initialSaved,
   initialCommentsCount,
 }: Props) {
   const [likesCount, setLikesCount] = useState(initialLikesCount)
   const [liked, setLiked] = useState(initialLiked)
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false)
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount)
+  const [saved, setSaved] = useState(initialSaved)
   const [comments, setComments] = useState<CommentRow[]>([])
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [commentDraft, setCommentDraft] = useState('')
   const [commentError, setCommentError] = useState<string | null>(null)
   const [likePending, setLikePending] = useState(false)
   const [likeError, setLikeError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [commentPending, setCommentPending] = useState(false)
+  const [savePending, setSavePending] = useState(false)
   const [shareSheetOpen, setShareSheetOpen] = useState(false)
   const [shareItems, setShareItems] = useState<ShareConversationItem[]>([])
   const [shareLoading, setShareLoading] = useState(false)
@@ -169,6 +175,23 @@ export function FeedPostEngagement({
     })
   }
 
+  const onSave = () => {
+    if (savePending) return
+    setSaveError(null)
+    const wasSaved = saved
+    setSaved(!wasSaved)
+    setSavePending(true)
+    void togglePostSaveAction(postId).then((r) => {
+      setSavePending(false)
+      if (!r.ok) {
+        setSaved(wasSaved)
+        setSaveError(r.error)
+        return
+      }
+      setSaved(r.saved)
+    })
+  }
+
   const sendToConversation = (conversationId: string) => {
     if (sendingConversationId) return
     setShareError(null)
@@ -222,14 +245,26 @@ export function FeedPostEngagement({
             <IconSend className="feed-icon-stroke" title="" />
           </button>
         </div>
-        <button type="button" className="feed-icon-btn" aria-label="Save">
-          <IconBookmark className="feed-icon-stroke" title="" />
+        <button
+          type="button"
+          className="feed-icon-btn"
+          aria-label={saved ? 'Unsave' : 'Save'}
+          aria-pressed={saved}
+          disabled={savePending}
+          onClick={onSave}
+        >
+          <IconBookmark className="feed-icon-stroke" title="" saved={saved} />
         </button>
       </div>
 
       {likeError ? (
         <p className="feed-like-error" role="alert">
           {likeError}
+        </p>
+      ) : null}
+      {saveError ? (
+        <p className="feed-like-error" role="alert">
+          {saveError}
         </p>
       ) : null}
       {shareError ? (

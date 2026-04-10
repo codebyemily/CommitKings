@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  getOrCreateConversationWithUser,
   openConversationByUsername,
 } from '@/app/actions/messages'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
@@ -46,7 +45,6 @@ export function MessagesListClient({
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [username, setUsername] = useState('')
-  const [userIdField, setUserIdField] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
 
   const onSubmitByUsername = (e: React.FormEvent) => {
@@ -59,24 +57,6 @@ export function MessagesListClient({
     }
     startTransition(async () => {
       const r = await openConversationByUsername(u)
-      if (r.ok) {
-        router.push(`/messages/${r.conversationId}`)
-      } else {
-        setFormError(r.error)
-      }
-    })
-  }
-
-  const onSubmitByUserId = (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormError(null)
-    const id = userIdField.trim()
-    if (!id) {
-      setFormError('Enter a user id.')
-      return
-    }
-    startTransition(async () => {
-      const r = await getOrCreateConversationWithUser(id)
       if (r.ok) {
         router.push(`/messages/${r.conversationId}`)
       } else {
@@ -108,28 +88,6 @@ export function MessagesListClient({
             {pending ? 'Opening…' : 'Start chat'}
           </button>
         </form>
-        <details className="feed-msg-advanced">
-          <summary>Or start by user ID</summary>
-          <form className="feed-msg-start-form" onSubmit={onSubmitByUserId}>
-            <label className="sr-only" htmlFor="msg-user-id">
-              User ID
-            </label>
-            <input
-              id="msg-user-id"
-              name="userId"
-              type="text"
-              className="feed-search-input"
-              placeholder="UUID from Supabase Auth"
-              autoComplete="off"
-              value={userIdField}
-              onChange={(e) => setUserIdField(e.target.value)}
-              disabled={pending}
-            />
-            <button type="submit" className="feed-msg-btn-secondary" disabled={pending}>
-              Open
-            </button>
-          </form>
-        </details>
       </div>
 
       {(withError || formError) && (

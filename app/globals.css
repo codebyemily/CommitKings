@@ -226,40 +226,28 @@ button.auth-link:hover {
 
 .feed-logo-heading {
   margin: 0;
-  line-height: 0;
-  font-size: 0;
+  line-height: 1.2;
+  font-size: 0.9375rem;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
-.feed-logo-link {
-  display: flex;
-  align-items: center;
-  line-height: 0;
+.feed-header-brand {
+  display: block;
+  color: var(--feed-text);
   text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(220px, 55vw);
 }
 
-.site-logo {
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-}
-
-.site-logo--header {
-  height: 36px;
-  width: 36px;
-  max-height: 36px;
-  max-width: min(120px, 36vw);
-}
-
-.site-logo--auth {
-  display: block;
-  max-height: clamp(64px, 22vw, 120px);
-  width: auto;
-  max-width: min(280px, 88vw);
-  margin-left: auto;
-  margin-right: auto;
+.feed-header-brand:hover {
+  opacity: 0.85;
 }
 
 .auth-logo-heading {
@@ -271,13 +259,32 @@ button.auth-link:hover {
   font-size: 0;
 }
 
+.auth-brand-heading {
+  margin: 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.auth-app-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 4.5vw, 1.625rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--auth-text);
+  text-align: center;
+}
+
 .feed-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Header only — slightly larger than 24px post actions to balance the logo */
+/* Header only — slightly larger than 24px post actions to balance the title */
 .feed-header .feed-icon-stroke {
   width: 28px;
   height: 28px;
@@ -1838,39 +1845,6 @@ html[data-theme="dark"] .activity-tab-active {
   font-size: 0.875rem;
   color: var(--feed-muted);
   word-break: break-all;
-}
-
-.profile-switch {
-  position: relative;
-  flex-shrink: 0;
-  width: 50px;
-  height: 30px;
-  padding: 0;
-  background: #d1d5db;
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.profile-switch-on {
-  background: #3b82f6;
-}
-
-.profile-switch-knob {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 24px;
-  height: 24px;
-  background: #ffffff;
-  border-radius: 50%;
-  transition: transform 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-.profile-switch-on .profile-switch-knob {
-  transform: translateX(20px);
 }
 
 .profile-link-row {

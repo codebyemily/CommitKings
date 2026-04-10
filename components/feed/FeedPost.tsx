@@ -4,6 +4,7 @@ import { FeedPostEngagement } from './FeedPostEngagement'
 export type FeedPostData = {
   id: string
   username: string
+  displayName: string
   imageSrc: string
   imageAlt: string
   likes: number
@@ -21,6 +22,7 @@ export type FeedPostData = {
 export function FeedPost({
   id,
   username,
+  displayName,
   imageSrc,
   imageAlt,
   likes,
@@ -33,6 +35,7 @@ export function FeedPost({
   imagePriority,
 }: FeedPostData) {
   const showHeader = Boolean(timeAgo)
+  const authorLabel = displayName || username
 
   return (
     <article className="feed-post">
@@ -49,10 +52,10 @@ export function FeedPost({
               />
             ) : (
               <span className="feed-avatar feed-avatar-fallback" aria-hidden>
-                {username.charAt(0).toUpperCase()}
+                {authorLabel.charAt(0).toUpperCase()}
               </span>
             )}
-            <span className="feed-username">{username}</span>
+            <span className="feed-username">{authorLabel}</span>
           </div>
           <span className="feed-time">{timeAgo}</span>
         </div>
@@ -71,7 +74,8 @@ export function FeedPost({
 
       <FeedPostEngagement
         postId={id}
-        captionUsername={username}
+        captionAuthorLabel={authorLabel}
+        shareAuthorUsername={username}
         caption={caption}
         imageSrc={imageSrc}
         initialLikesCount={likes}

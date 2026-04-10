@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthorIdentityFromProfile } from '@/lib/data/profile-identity'
 import { engagementSchemaErrorMessage } from '@/lib/posts/schema-fallback'
 import { revalidatePath } from 'next/cache'
 
@@ -118,23 +119,10 @@ export async function addPostCommentAction(
     return { ok: false, error: 'You must be signed in.' }
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('username, display_name')
-    .eq('id', user.id)
-    .maybeSingle()
-
-  const meta = user.user_metadata as Record<string, unknown>
-  const username =
-    profile?.username?.trim() ||
-    (typeof meta?.username === 'string' && meta.username.trim()) ||
-    user.email?.split('@')[0] ||
-    'user'
-  const displayName =
-    profile?.display_name?.trim() ||
-    (typeof meta?.full_name === 'string' && meta.full_name.trim()) ||
-    (typeof meta?.display_name === 'string' && meta.display_name.trim()) ||
-    username
+  const { username, displayName } = await getAuthorIdentityFromProfile(
+    supabase,
+    user,
+  )
 
   const { data: row, error } = await supabase
     .from('post_comments')

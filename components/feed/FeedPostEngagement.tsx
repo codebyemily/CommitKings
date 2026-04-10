@@ -31,7 +31,8 @@ export type CommentRow = {
 
 type Props = {
   postId: string
-  captionUsername: string
+  captionAuthorLabel: string
+  shareAuthorUsername: string
   caption: string
   imageSrc: string
   initialLikesCount: number
@@ -65,7 +66,8 @@ function peerAvatarSrc(path: string | null): string | null {
 
 export function FeedPostEngagement({
   postId,
-  captionUsername,
+  captionAuthorLabel,
+  shareAuthorUsername,
   caption,
   imageSrc,
   initialLikesCount,
@@ -199,7 +201,7 @@ export function FeedPostEngagement({
     void sharePostToConversation({
       conversationId,
       postId,
-      authorUsername: captionUsername,
+      authorUsername: shareAuthorUsername,
       caption,
       imageSrc,
     }).then((r) => {
@@ -278,7 +280,7 @@ export function FeedPostEngagement({
       </p>
 
       <p className="feed-caption">
-        <span className="feed-username feed-caption-user">{captionUsername}</span>{' '}
+        <span className="feed-username feed-caption-user">{captionAuthorLabel}</span>{' '}
         <span className="feed-caption-text">{caption}</span>
       </p>
 

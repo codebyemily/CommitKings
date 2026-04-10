@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthorIdentityFromProfile } from '@/lib/data/profile-identity'
 import { isMissingAuthorAvatarPathColumn } from '@/lib/posts/schema-fallback'
 import { revalidatePath } from 'next/cache'
 
@@ -41,20 +42,8 @@ export async function createPostAction(formData: FormData): Promise<CreatePostRe
 
   const caption = String(formData.get('caption') ?? '').slice(0, 2200)
 
-  const meta = user.user_metadata as Record<string, unknown>
-  const username =
-    (typeof meta?.username === 'string' && meta.username.trim()) ||
-    user.email?.split('@')[0] ||
-    'user'
-  const displayName =
-    (typeof meta?.full_name === 'string' && meta.full_name.trim()) ||
-    (typeof meta?.display_name === 'string' && meta.display_name.trim()) ||
-    username
-
-  const authorAvatarPath =
-    typeof meta?.avatar_path === 'string' && meta.avatar_path.trim()
-      ? meta.avatar_path.trim()
-      : null
+  const { username, displayName, avatarPath: authorAvatarPath } =
+    await getAuthorIdentityFromProfile(supabase, user)
 
   const ext =
     file.type === 'image/png'

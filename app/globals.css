@@ -806,6 +806,12 @@ html:not([data-theme]) .feed-msg-btn-secondary {
   gap: 4px;
 }
 
+.feed-like-error {
+  margin: 0 0 6px;
+  font-size: 0.8125rem;
+  color: #b91c1c;
+}
+
 .feed-likes {
   margin: 0 0 6px;
   font-size: 0.875rem;
@@ -824,6 +830,126 @@ html:not([data-theme]) .feed-msg-btn-secondary {
 
 .feed-caption-text {
   font-weight: 400;
+}
+
+.feed-view-comments {
+  display: block;
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--feed-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.feed-view-comments:hover {
+  color: var(--feed-text);
+}
+
+.feed-comments-section {
+  margin-top: 4px;
+  padding-bottom: 4px;
+}
+
+.feed-comments-loading,
+.feed-comments-empty {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  color: var(--feed-muted);
+}
+
+.feed-comments-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.feed-comment-item {
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.feed-comment-author {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.feed-comment-body {
+  font-weight: 400;
+  word-break: break-word;
+}
+
+.feed-comment-time {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.6875rem;
+  color: var(--feed-muted);
+}
+
+.feed-comment-form {
+  margin-top: 4px;
+}
+
+.feed-comment-error {
+  margin: 0 0 6px;
+  font-size: 0.8125rem;
+  color: #b91c1c;
+}
+
+.feed-comment-form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-comment-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--feed-text);
+  background: #fafafa;
+  border: 1px solid var(--feed-border);
+  border-radius: 8px;
+  outline: none;
+}
+
+.feed-comment-input:focus {
+  border-color: #3b82f6;
+}
+
+.feed-comment-submit {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #ffffff;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.feed-comment-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+html[data-theme='dark'] .feed-comment-input {
+  background: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .feed-comment-input {
+    background: #171717;
+  }
 }
 
 .feed-bottom-nav {

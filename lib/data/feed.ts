@@ -14,7 +14,7 @@ export type FeedViewerContext = {
 }
 
 const POSTS_SELECT_CORE =
-  'id, user_id, caption, image_path, created_at, author_username, likes_count'
+  'id, user_id, caption, image_path, created_at, author_username, author_display_name, likes_count'
 const POSTS_SELECT_BASE = `${POSTS_SELECT_CORE}, comments_count`
 const POSTS_SELECT_WITH_AVATAR = `${POSTS_SELECT_BASE}, author_avatar_path`
 const POSTS_SELECT_WITH_AVATAR_NO_COMMENTS = `${POSTS_SELECT_CORE}, author_avatar_path`
@@ -109,12 +109,17 @@ export async function getFeedPosts(
       typeof row.likes_count === 'number' ? row.likes_count : 0
     const authorUsername =
       typeof row.author_username === 'string' ? row.author_username : 'user'
+    const authorDisplayName =
+      typeof row.author_display_name === 'string' && row.author_display_name.trim()
+        ? row.author_display_name.trim()
+        : authorUsername
     const createdAt =
       typeof row.created_at === 'string' ? row.created_at : new Date().toISOString()
 
     return {
       id,
       username: authorUsername,
+      displayName: authorDisplayName,
       imageSrc: getPostImagePublicUrl(imagePath),
       imageAlt: caption ? caption.slice(0, 120) : 'Post photo',
       likes: likesCount,

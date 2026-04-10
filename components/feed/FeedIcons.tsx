@@ -86,7 +86,30 @@ export function IconSend({ className, title }: IconProps) {
   )
 }
 
-export function IconBookmark({ className, title }: IconProps) {
+export function IconBookmark({
+  className,
+  title,
+  saved,
+}: IconProps & { saved?: boolean }) {
+  if (saved) {
+    return (
+      <svg
+        className={className}
+        width={24}
+        height={24}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden={title ? undefined : true}
+      >
+        {title ? <title>{title}</title> : null}
+        <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+      </svg>
+    )
+  }
   return (
     <svg
       className={className}

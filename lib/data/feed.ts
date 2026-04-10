@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
-import { isMissingPostLikesTable } from '@/lib/posts/schema-fallback'
+import {
+  isMissingPostLikesTable,
+  isMissingPostSavesTable,
+} from '@/lib/posts/schema-fallback'
 import { formatPostTime } from '@/lib/posts/time'
 import type { FeedPostData } from '@/components/feed/FeedPost'
 
@@ -53,6 +56,7 @@ export async function getFeedPosts(
 
   const postIds = data.map((r) => r.id)
   let likedIds = new Set<string>()
+  let savedIds = new Set<string>()
   if (viewer?.userId && postIds.length > 0) {
     const { data: likeRows, error: likeErr } = await supabase
       .from('post_likes')
@@ -65,6 +69,19 @@ export async function getFeedPosts(
       )
     } else if (likeErr && !isMissingPostLikesTable(likeErr.message)) {
       console.error('getFeedPosts post_likes:', likeErr.message)
+    }
+
+    const { data: saveRows, error: saveErr } = await supabase
+      .from('post_saves')
+      .select('post_id')
+      .eq('user_id', viewer.userId)
+      .in('post_id', postIds)
+    if (!saveErr && saveRows) {
+      savedIds = new Set(
+        saveRows.map((r) => r.post_id).filter(Boolean) as string[],
+      )
+    } else if (saveErr && !isMissingPostSavesTable(saveErr.message)) {
+      console.error('getFeedPosts post_saves:', saveErr.message)
     }
   }
 
@@ -103,6 +120,7 @@ export async function getFeedPosts(
       likes: likesCount,
       commentsCount,
       likedByViewer: viewer?.userId ? likedIds.has(id) : false,
+      savedByViewer: viewer?.userId ? savedIds.has(id) : false,
       caption,
       timeAgo: formatPostTime(createdAt),
       avatarSrc: path ? getPostImagePublicUrl(path) : undefined,

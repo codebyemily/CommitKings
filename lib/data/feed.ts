@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
-import { isMissingAuthorAvatarPathColumn } from '@/lib/posts/schema-fallback'
+import {
+  isMissingPostLikesTable,
+  isMissingPostSavesTable,
+} from '@/lib/posts/schema-fallback'
 import { formatPostTime } from '@/lib/posts/time'
 import type { FeedPostData } from '@/components/feed/FeedPost'
 
@@ -10,39 +13,81 @@ export type FeedViewerContext = {
   avatarStoragePath: string | null
 }
 
-const POSTS_SELECT_BASE =
-  'id, user_id, caption, image_path, created_at, author_username, likes_count'
+const POSTS_SELECT_CORE =
+  'id, user_id, caption, image_path, created_at, author_username, author_display_name, likes_count'
+const POSTS_SELECT_BASE = `${POSTS_SELECT_CORE}, comments_count`
 const POSTS_SELECT_WITH_AVATAR = `${POSTS_SELECT_BASE}, author_avatar_path`
+const POSTS_SELECT_WITH_AVATAR_NO_COMMENTS = `${POSTS_SELECT_CORE}, author_avatar_path`
 
 export async function getFeedPosts(
   viewer?: FeedViewerContext | null,
 ): Promise<FeedPostData[]> {
   const supabase = await createClient()
 
-  let { data, error } = await supabase
-    .from('posts')
-    .select(POSTS_SELECT_WITH_AVATAR)
-    .order('created_at', { ascending: false })
-    .limit(100)
+  const selectAttempts = [
+    POSTS_SELECT_WITH_AVATAR,
+    POSTS_SELECT_WITH_AVATAR_NO_COMMENTS,
+    POSTS_SELECT_BASE,
+    POSTS_SELECT_CORE,
+  ]
 
-  if (error && isMissingAuthorAvatarPathColumn(error.message)) {
-    const retry = await supabase
+  let data: Record<string, unknown>[] | null = null
+  let lastError: { message: string } | null = null
+
+  for (const sel of selectAttempts) {
+    const res = await supabase
       .from('posts')
-      .select(POSTS_SELECT_BASE)
+      .select(sel)
       .order('created_at', { ascending: false })
       .limit(100)
-    data = retry.data as typeof data
-    error = retry.error
+    if (!res.error) {
+      data = (res.data ?? []) as unknown as Record<string, unknown>[]
+      break
+    }
+    lastError = res.error
   }
 
-  if (error) {
-    console.error('getFeedPosts:', error.message)
+  if (!data && lastError) {
+    console.error('getFeedPosts:', lastError.message)
     return []
   }
 
   if (!data?.length) return []
 
+  const postIds = data.map((r) => r.id)
+  let likedIds = new Set<string>()
+  let savedIds = new Set<string>()
+  if (viewer?.userId && postIds.length > 0) {
+    const { data: likeRows, error: likeErr } = await supabase
+      .from('post_likes')
+      .select('post_id')
+      .eq('user_id', viewer.userId)
+      .in('post_id', postIds)
+    if (!likeErr && likeRows) {
+      likedIds = new Set(
+        likeRows.map((r) => r.post_id).filter(Boolean) as string[],
+      )
+    } else if (likeErr && !isMissingPostLikesTable(likeErr.message)) {
+      console.error('getFeedPosts post_likes:', likeErr.message)
+    }
+
+    const { data: saveRows, error: saveErr } = await supabase
+      .from('post_saves')
+      .select('post_id')
+      .eq('user_id', viewer.userId)
+      .in('post_id', postIds)
+    if (!saveErr && saveRows) {
+      savedIds = new Set(
+        saveRows.map((r) => r.post_id).filter(Boolean) as string[],
+      )
+    } else if (saveErr && !isMissingPostSavesTable(saveErr.message)) {
+      console.error('getFeedPosts post_saves:', saveErr.message)
+    }
+  }
+
   return data.map((row, index) => {
+    const id = String(row.id ?? '')
+    const imagePath = String(row.image_path ?? '')
     let path =
       'author_avatar_path' in row && row.author_avatar_path
         ? String(row.author_avatar_path).trim()
@@ -50,18 +95,39 @@ export async function getFeedPosts(
     if (
       !path &&
       viewer?.avatarStoragePath &&
-      row.user_id === viewer.userId
+      String(row.user_id) === viewer.userId
     ) {
       path = viewer.avatarStoragePath
     }
+    const commentsCount =
+      'comments_count' in row && typeof row.comments_count === 'number'
+        ? row.comments_count
+        : 0
+
+    const caption = typeof row.caption === 'string' ? row.caption : ''
+    const likesCount =
+      typeof row.likes_count === 'number' ? row.likes_count : 0
+    const authorUsername =
+      typeof row.author_username === 'string' ? row.author_username : 'user'
+    const authorDisplayName =
+      typeof row.author_display_name === 'string' && row.author_display_name.trim()
+        ? row.author_display_name.trim()
+        : authorUsername
+    const createdAt =
+      typeof row.created_at === 'string' ? row.created_at : new Date().toISOString()
+
     return {
-      id: row.id,
-      username: row.author_username,
-      imageSrc: getPostImagePublicUrl(row.image_path),
-      imageAlt: row.caption ? row.caption.slice(0, 120) : 'Post photo',
-      likes: row.likes_count ?? 0,
-      caption: row.caption ?? '',
-      timeAgo: formatPostTime(row.created_at),
+      id,
+      username: authorUsername,
+      displayName: authorDisplayName,
+      imageSrc: getPostImagePublicUrl(imagePath),
+      imageAlt: caption ? caption.slice(0, 120) : 'Post photo',
+      likes: likesCount,
+      commentsCount,
+      likedByViewer: viewer?.userId ? likedIds.has(id) : false,
+      savedByViewer: viewer?.userId ? savedIds.has(id) : false,
+      caption,
+      timeAgo: formatPostTime(createdAt),
       avatarSrc: path ? getPostImagePublicUrl(path) : undefined,
       imagePriority: index === 0,
     }

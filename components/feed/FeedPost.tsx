@@ -1,17 +1,16 @@
 import Image from 'next/image'
-import {
-  IconBookmark,
-  IconBubble,
-  IconHeart,
-  IconSend,
-} from './FeedIcons'
+import { FeedPostEngagement } from './FeedPostEngagement'
 
 export type FeedPostData = {
   id: string
   username: string
+  displayName: string
   imageSrc: string
   imageAlt: string
   likes: number
+  commentsCount: number
+  likedByViewer: boolean
+  savedByViewer: boolean
   caption: string
   /** If set, show the top row (avatar + username + time). */
   timeAgo?: string
@@ -21,16 +20,22 @@ export type FeedPostData = {
 }
 
 export function FeedPost({
+  id,
   username,
+  displayName,
   imageSrc,
   imageAlt,
   likes,
+  commentsCount,
+  likedByViewer,
+  savedByViewer,
   caption,
   timeAgo,
   avatarSrc,
   imagePriority,
 }: FeedPostData) {
   const showHeader = Boolean(timeAgo)
+  const authorLabel = displayName || username
 
   return (
     <article className="feed-post">
@@ -47,10 +52,10 @@ export function FeedPost({
               />
             ) : (
               <span className="feed-avatar feed-avatar-fallback" aria-hidden>
-                {username.charAt(0).toUpperCase()}
+                {authorLabel.charAt(0).toUpperCase()}
               </span>
             )}
-            <span className="feed-username">{username}</span>
+            <span className="feed-username">{authorLabel}</span>
           </div>
           <span className="feed-time">{timeAgo}</span>
         </div>
@@ -67,33 +72,17 @@ export function FeedPost({
         />
       </div>
 
-      <div className="feed-post-body">
-        <div className="feed-actions">
-          <div className="feed-actions-left">
-            <button type="button" className="feed-icon-btn" aria-label="Like">
-              <IconHeart className="feed-icon-stroke" />
-            </button>
-            <button type="button" className="feed-icon-btn" aria-label="Comment">
-              <IconBubble className="feed-icon-stroke" />
-            </button>
-            <button type="button" className="feed-icon-btn" aria-label="Share">
-              <IconSend className="feed-icon-stroke" />
-            </button>
-          </div>
-          <button type="button" className="feed-icon-btn" aria-label="Save">
-            <IconBookmark className="feed-icon-stroke" />
-          </button>
-        </div>
-
-        <p className="feed-likes">
-          {likes === 1 ? '1 like' : `${likes.toLocaleString()} likes`}
-        </p>
-
-        <p className="feed-caption">
-          <span className="feed-username feed-caption-user">{username}</span>{' '}
-          <span className="feed-caption-text">{caption}</span>
-        </p>
-      </div>
+      <FeedPostEngagement
+        postId={id}
+        captionAuthorLabel={authorLabel}
+        shareAuthorUsername={username}
+        caption={caption}
+        imageSrc={imageSrc}
+        initialLikesCount={likes}
+        initialLiked={likedByViewer}
+        initialSaved={savedByViewer}
+        initialCommentsCount={commentsCount}
+      />
     </article>
   )
 }

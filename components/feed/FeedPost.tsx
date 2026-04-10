@@ -71,6 +71,7 @@ export function FeedPost({
         postId={id}
         captionUsername={username}
         caption={caption}
+        imageSrc={imageSrc}
         initialLikesCount={likes}
         initialLiked={likedByViewer}
         initialCommentsCount={commentsCount}

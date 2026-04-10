@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { toConversationPreview } from '@/lib/messages/share'
 import type { DirectMessageRow } from '@/lib/messages/types'
 
 export type ConversationListItem = {
@@ -68,7 +69,7 @@ export async function getConversationsForUser(
       peerDisplayName: p?.display_name ?? 'Member',
       peerAvatarPath: p?.avatar_path ?? null,
       lastMessageAt: c.last_message_at,
-      lastMessagePreview: c.last_message_preview,
+      lastMessagePreview: toConversationPreview(c.last_message_preview),
     }
   })
 }

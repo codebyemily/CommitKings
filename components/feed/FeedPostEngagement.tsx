@@ -4,13 +4,20 @@ import {
   addPostCommentAction,
   togglePostLikeAction,
 } from '@/app/actions/post-engagement'
+import {
+  getShareConversationItems,
+  sharePostToConversation,
+  type ShareConversationItem,
+} from '@/app/actions/messages'
 import { createClient } from '@/lib/supabase/client'
+import { getPostImagePublicUrl } from '@/lib/posts/public-url'
 import {
   IconBookmark,
   IconBubble,
   IconHeart,
   IconSend,
 } from './FeedIcons'
+import Image from 'next/image'
 import { useCallback, useState } from 'react'
 
 export type CommentRow = {
@@ -25,6 +32,7 @@ type Props = {
   postId: string
   captionUsername: string
   caption: string
+  imageSrc: string
   initialLikesCount: number
   initialLiked: boolean
   initialCommentsCount: number
@@ -44,10 +52,20 @@ function formatCommentTime(iso: string): string {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
+function peerAvatarSrc(path: string | null): string | null {
+  if (!path?.trim()) return null
+  try {
+    return getPostImagePublicUrl(path.trim())
+  } catch {
+    return null
+  }
+}
+
 export function FeedPostEngagement({
   postId,
   captionUsername,
   caption,
+  imageSrc,
   initialLikesCount,
   initialLiked,
   initialCommentsCount,
@@ -63,6 +81,13 @@ export function FeedPostEngagement({
   const [likePending, setLikePending] = useState(false)
   const [likeError, setLikeError] = useState<string | null>(null)
   const [commentPending, setCommentPending] = useState(false)
+  const [shareSheetOpen, setShareSheetOpen] = useState(false)
+  const [shareItems, setShareItems] = useState<ShareConversationItem[]>([])
+  const [shareLoading, setShareLoading] = useState(false)
+  const [sendingConversationId, setSendingConversationId] = useState<string | null>(
+    null,
+  )
+  const [shareError, setShareError] = useState<string | null>(null)
 
   const loadComments = useCallback(async () => {
     setCommentsLoading(true)
@@ -129,6 +154,41 @@ export function FeedPostEngagement({
     })
   }
 
+  const onShare = () => {
+    if (shareLoading) return
+    setShareError(null)
+    setShareSheetOpen(true)
+    setShareLoading(true)
+    void getShareConversationItems().then((r) => {
+      setShareLoading(false)
+      if (!r.ok) {
+        setShareError(r.error)
+        return
+      }
+      setShareItems(r.items)
+    })
+  }
+
+  const sendToConversation = (conversationId: string) => {
+    if (sendingConversationId) return
+    setShareError(null)
+    setSendingConversationId(conversationId)
+    void sharePostToConversation({
+      conversationId,
+      postId,
+      authorUsername: captionUsername,
+      caption,
+      imageSrc,
+    }).then((r) => {
+      setSendingConversationId(null)
+      if (!r.ok) {
+        setShareError(r.error)
+        return
+      }
+      setShareSheetOpen(false)
+    })
+  }
+
   return (
     <div className="feed-post-body">
       <div className="feed-actions">
@@ -152,7 +212,13 @@ export function FeedPostEngagement({
           >
             <IconBubble className="feed-icon-stroke" title="" />
           </button>
-          <button type="button" className="feed-icon-btn" aria-label="Share">
+          <button
+            type="button"
+            className="feed-icon-btn"
+            aria-label="Share"
+            disabled={shareLoading}
+            onClick={onShare}
+          >
             <IconSend className="feed-icon-stroke" title="" />
           </button>
         </div>
@@ -164,6 +230,11 @@ export function FeedPostEngagement({
       {likeError ? (
         <p className="feed-like-error" role="alert">
           {likeError}
+        </p>
+      ) : null}
+      {shareError ? (
+        <p className="feed-like-error" role="alert">
+          {shareError}
         </p>
       ) : null}
 
@@ -233,6 +304,83 @@ export function FeedPostEngagement({
               </button>
             </div>
           </form>
+        </div>
+      ) : null}
+      {shareSheetOpen ? (
+        <div
+          className="feed-share-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Share post"
+          onClick={() => setShareSheetOpen(false)}
+        >
+          <div className="feed-share-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="feed-share-grabber" aria-hidden />
+            <div className="feed-share-head">
+              <p className="feed-share-title">Share</p>
+              <button
+                type="button"
+                className="feed-share-close"
+                aria-label="Close share sheet"
+                onClick={() => setShareSheetOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            {shareLoading ? (
+              <p className="feed-share-empty">Loading conversations…</p>
+            ) : shareItems.length === 0 ? (
+              <p className="feed-share-empty">
+                No conversations yet. Start a chat in Messages first.
+              </p>
+            ) : (
+              <ul className="feed-share-list">
+                {shareItems.map((item) => {
+                  const avatarSrc = peerAvatarSrc(item.peerAvatarPath)
+                  const initial = (
+                    item.peerDisplayName ||
+                    item.peerUsername ||
+                    'U'
+                  )
+                    .slice(0, 1)
+                    .toUpperCase()
+                  const isSending = sendingConversationId === item.conversationId
+                  return (
+                    <li className="feed-share-row" key={item.conversationId}>
+                      <div className="feed-share-user">
+                        {avatarSrc ? (
+                          <Image
+                            src={avatarSrc}
+                            alt=""
+                            width={44}
+                            height={44}
+                            className="feed-avatar"
+                            unoptimized
+                          />
+                        ) : (
+                          <span className="feed-avatar feed-avatar-fallback" aria-hidden>
+                            {initial}
+                          </span>
+                        )}
+                        <div className="feed-share-user-copy">
+                          <span className="feed-share-name">{item.peerDisplayName}</span>
+                          <span className="feed-share-handle">@{item.peerUsername}</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="feed-share-send"
+                        disabled={isSending || Boolean(sendingConversationId)}
+                        onClick={() => sendToConversation(item.conversationId)}
+                      >
+                        {isSending ? 'Sending…' : 'Send'}
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </div>
         </div>
       ) : null}
     </div>

@@ -72,7 +72,7 @@ export function FeedPostEngagement({
 }: Props) {
   const [likesCount, setLikesCount] = useState(initialLikesCount)
   const [liked, setLiked] = useState(initialLiked)
-  const [commentsOpen, setCommentsOpen] = useState(false)
+  const [commentsSheetOpen, setCommentsSheetOpen] = useState(false)
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount)
   const [comments, setComments] = useState<CommentRow[]>([])
   const [commentsLoading, setCommentsLoading] = useState(false)
@@ -111,7 +111,7 @@ export function FeedPostEngagement({
   }, [postId])
 
   const openComments = () => {
-    setCommentsOpen(true)
+    setCommentsSheetOpen(true)
     void loadComments()
   }
 
@@ -207,8 +207,8 @@ export function FeedPostEngagement({
             type="button"
             className="feed-icon-btn"
             aria-label="Comment"
-            aria-expanded={commentsOpen}
-            onClick={() => (commentsOpen ? setCommentsOpen(false) : openComments())}
+            aria-expanded={commentsSheetOpen}
+            onClick={openComments}
           >
             <IconBubble className="feed-icon-stroke" title="" />
           </button>
@@ -247,7 +247,7 @@ export function FeedPostEngagement({
         <span className="feed-caption-text">{caption}</span>
       </p>
 
-      {commentsCount > 0 && !commentsOpen ? (
+      {commentsCount > 0 && !commentsSheetOpen ? (
         <button
           type="button"
           className="feed-view-comments"
@@ -257,53 +257,81 @@ export function FeedPostEngagement({
         </button>
       ) : null}
 
-      {commentsOpen ? (
-        <div className="feed-comments-section">
-          {commentsLoading ? (
-            <p className="feed-comments-loading">Loading comments…</p>
-          ) : comments.length === 0 ? (
-            <p className="feed-comments-empty">No comments yet.</p>
-          ) : (
-            <ul className="feed-comments-list">
-              {comments.map((c) => (
-                <li key={c.id} className="feed-comment-item">
-                  <span className="feed-comment-author">{c.author_display_name}</span>{' '}
-                  <span className="feed-comment-body">{c.body}</span>
-                  <span className="feed-comment-time">{formatCommentTime(c.created_at)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <form className="feed-comment-form" onSubmit={onSubmitComment}>
-            {commentError ? (
-              <p className="feed-comment-error" role="alert">
-                {commentError}
+      {commentsSheetOpen ? (
+        <div
+          className="feed-comments-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Comments"
+          onClick={() => setCommentsSheetOpen(false)}
+        >
+          <div
+            className="feed-comments-sheet"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="feed-share-grabber" aria-hidden />
+            <div className="feed-comments-head">
+              <p className="feed-comments-title">
+                Comments {commentsCount > 0 ? `(${commentsCount})` : ''}
               </p>
-            ) : null}
-            <div className="feed-comment-form-row">
-              <label className="sr-only" htmlFor={`comment-${postId}`}>
-                Add a comment
-              </label>
-              <input
-                id={`comment-${postId}`}
-                type="text"
-                className="feed-comment-input"
-                placeholder="Add a comment…"
-                maxLength={2000}
-                value={commentDraft}
-                onChange={(e) => setCommentDraft(e.target.value)}
-                disabled={commentPending}
-              />
               <button
-                type="submit"
-                className="feed-comment-submit"
-                disabled={commentPending || !commentDraft.trim()}
+                type="button"
+                className="feed-share-close"
+                aria-label="Close comments"
+                onClick={() => setCommentsSheetOpen(false)}
               >
-                Post
+                ×
               </button>
             </div>
-          </form>
+
+            <div className="feed-comments-sheet-list">
+              {commentsLoading ? (
+                <p className="feed-comments-loading">Loading comments…</p>
+              ) : comments.length === 0 ? (
+                <p className="feed-comments-empty">No comments yet.</p>
+              ) : (
+                <ul className="feed-comments-list">
+                  {comments.map((c) => (
+                    <li key={c.id} className="feed-comment-item">
+                      <span className="feed-comment-author">{c.author_display_name}</span>{' '}
+                      <span className="feed-comment-body">{c.body}</span>
+                      <span className="feed-comment-time">{formatCommentTime(c.created_at)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <form className="feed-comment-form feed-comment-form-sticky" onSubmit={onSubmitComment}>
+              {commentError ? (
+                <p className="feed-comment-error" role="alert">
+                  {commentError}
+                </p>
+              ) : null}
+              <div className="feed-comment-form-row">
+                <label className="sr-only" htmlFor={`comment-${postId}`}>
+                  Add a comment
+                </label>
+                <input
+                  id={`comment-${postId}`}
+                  type="text"
+                  className="feed-comment-input"
+                  placeholder="Add a comment…"
+                  maxLength={2000}
+                  value={commentDraft}
+                  onChange={(e) => setCommentDraft(e.target.value)}
+                  disabled={commentPending}
+                />
+                <button
+                  type="submit"
+                  className="feed-comment-submit"
+                  disabled={commentPending || !commentDraft.trim()}
+                >
+                  Post
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       ) : null}
       {shareSheetOpen ? (

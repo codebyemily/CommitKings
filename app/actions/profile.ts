@@ -107,6 +107,21 @@ export async function updateProfileAction(
     return { ok: false, error: updateError.message }
   }
 
+  const { error: profileRowError } = await supabase.from('profiles').upsert(
+    {
+      id: user.id,
+      username,
+      display_name: displayName,
+      avatar_path: avatarPath || null,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'id' },
+  )
+
+  if (profileRowError) {
+    return { ok: false, error: profileRowError.message }
+  }
+
   const { error: postsError } = await supabase
     .from('posts')
     .update({ author_avatar_path: avatarPath || null })

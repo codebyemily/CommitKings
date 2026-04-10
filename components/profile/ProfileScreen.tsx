@@ -4,7 +4,6 @@ import { FeedHeader } from '@/components/feed/FeedHeader'
 import { BottomNav } from '@/components/feed/BottomNav'
 import { SignOutButton } from '@/components/auth/SignOutButton'
 import { ProfileAppearance } from './ProfileAppearance'
-import { ProfileNotificationsToggle } from './ProfileNotificationsToggle'
 import { ProfileEditButton } from './ProfileEditButton'
 
 type ProfileScreenProps = {
@@ -93,11 +92,6 @@ export function ProfileScreen({
               </li>
             ))}
           </ul>
-        </section>
-
-        <section className="profile-card">
-          <p className="profile-section-label">Notifications</p>
-          <ProfileNotificationsToggle />
         </section>
 
         <section className="profile-card">

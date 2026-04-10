@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { LoginForm } from '@/components/auth/LoginForm'
-import { SiteLogo } from '@/components/brand/SiteLogo'
 
 export const metadata: Metadata = {
   title: 'Sign in',
@@ -9,8 +8,8 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <main className="auth-card">
-      <h1 className="auth-logo-heading">
-        <SiteLogo variant="auth" />
+      <h1 className="auth-brand-heading">
+        <span className="auth-app-title">Forum Neighborhood</span>
       </h1>
       <p className="auth-subtitle">Sign in to continue</p>
       <LoginForm />

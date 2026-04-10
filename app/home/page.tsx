@@ -18,9 +18,16 @@ export default async function HomePage() {
     redirect('/login')
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('avatar_path')
+    .eq('id', user.id)
+    .maybeSingle()
+
   const meta = user.user_metadata as Record<string, unknown>
   const avatarPathRaw =
-    typeof meta.avatar_path === 'string' ? meta.avatar_path.trim() : ''
+    (typeof profile?.avatar_path === 'string' && profile.avatar_path.trim()) ||
+    (typeof meta?.avatar_path === 'string' ? meta.avatar_path.trim() : '')
   const posts = await getFeedPosts({
     userId: user.id,
     avatarStoragePath: avatarPathRaw || null,

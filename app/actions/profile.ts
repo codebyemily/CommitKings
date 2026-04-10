@@ -112,6 +112,7 @@ export async function updateProfileAction(
       id: user.id,
       username,
       display_name: displayName,
+      bio,
       avatar_path: avatarPath || null,
       updated_at: new Date().toISOString(),
     },
@@ -124,7 +125,11 @@ export async function updateProfileAction(
 
   const { error: postsError } = await supabase
     .from('posts')
-    .update({ author_avatar_path: avatarPath || null })
+    .update({
+      author_username: username,
+      author_display_name: displayName,
+      author_avatar_path: avatarPath || null,
+    })
     .eq('user_id', user.id)
 
   if (
@@ -136,5 +141,6 @@ export async function updateProfileAction(
 
   revalidatePath('/profile')
   revalidatePath('/home')
+  revalidatePath('/activity')
   return { ok: true }
 }

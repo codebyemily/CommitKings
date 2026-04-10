@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
+import { decodeSharedPostMessage } from '@/lib/messages/share'
 import type { DirectMessageRow } from '@/lib/messages/types'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
 import Image from 'next/image'
@@ -152,13 +153,31 @@ export function ConversationThreadClient({
           <ul className="feed-msg-bubbles">
             {messages.map((m) => {
               const mine = m.sender_id === currentUserId
+              const sharedPost = decodeSharedPostMessage(m.body)
               return (
                 <li
                   key={m.id}
                   className={mine ? 'feed-msg-row feed-msg-row-mine' : 'feed-msg-row'}
                 >
                   <div className={mine ? 'feed-msg-bubble feed-msg-bubble-mine' : 'feed-msg-bubble'}>
-                    <p className="feed-msg-text">{m.body}</p>
+                    {sharedPost ? (
+                      <div>
+                        <p className="feed-msg-text">Shared a post</p>
+                        <Image
+                          src={sharedPost.imageSrc}
+                          alt={sharedPost.caption ? sharedPost.caption.slice(0, 120) : 'Shared post'}
+                          width={220}
+                          height={220}
+                          className="feed-msg-shared-image"
+                          unoptimized
+                        />
+                        <p className="feed-msg-text">
+                          <strong>@{sharedPost.authorUsername}</strong> {sharedPost.caption}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="feed-msg-text">{m.body}</p>
+                    )}
                     <time className="feed-msg-meta" dateTime={m.created_at}>
                       {formatMsgTime(m.created_at)}
                     </time>

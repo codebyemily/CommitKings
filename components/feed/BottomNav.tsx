@@ -14,7 +14,7 @@ export function BottomNav() {
   const pathname = usePathname()
   const homeActive = pathname === '/home'
   const searchActive = pathname === '/search'
-  const messagesActive = pathname === '/messages'
+  const messagesActive = pathname === '/messages' || pathname.startsWith('/messages/')
   const profileActive = pathname === '/profile'
   const createActive = pathname === '/create'
 

@@ -11,6 +11,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --brand-purple: #5a189a;
+  --brand-purple-dark: #451173;
+  --brand-purple-soft: rgba(90, 24, 154, 0.2);
+  --brand-yellow: #ffd60a;
+  --brand-yellow-soft: #fff1a8;
 }
 
 body {
@@ -24,8 +29,8 @@ body {
   --auth-text: #000000;
   --auth-muted: #6b7280;
   --auth-border: #d1d5db;
-  --auth-primary: #3b82f6;
-  --auth-primary-hover: #2563eb;
+  --auth-primary: var(--brand-purple);
+  --auth-primary-hover: var(--brand-purple-dark);
   --auth-input-bg: #ffffff;
   --auth-footer-text: #374151;
   --auth-divider: #e5e7eb;
@@ -197,7 +202,12 @@ button.auth-link:hover {
   --feed-text: #000000;
   --feed-muted: #8e8e8e;
   --feed-border: #dbdbdb;
-  --feed-bg: #ffffff;
+  --feed-bg: #ffef1f;
+  --feed-accent: var(--brand-purple);
+  --feed-accent-hover: var(--brand-purple-dark);
+  --feed-accent-soft: var(--brand-purple-soft);
+  --feed-highlight: var(--brand-yellow);
+  --feed-highlight-soft: var(--brand-yellow-soft);
 
   min-height: 100svh;
   max-width: 480px;
@@ -240,6 +250,7 @@ button.auth-link:hover {
   font-weight: 700;
   font-size: 0.9375rem;
   letter-spacing: -0.02em;
+  margin-left: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -323,6 +334,7 @@ button.auth-link:hover {
   overflow-y: auto;
   padding-bottom: calc(var(--feed-nav-h) + env(safe-area-inset-bottom, 0px));
   -webkit-overflow-scrolling: touch;
+  background: #fff200;
 }
 
 .feed-empty-state {
@@ -752,7 +764,11 @@ html:not([data-theme]) .feed-msg-btn-secondary {
 }
 
 .feed-post {
-  border-bottom: 1px solid var(--feed-border);
+  margin: 10px 12px;
+  border: 1px solid #e8cf00;
+  border-radius: 12px;
+  background: #fffde0;
+  overflow: hidden;
 }
 
 .feed-post-header {
@@ -1198,23 +1214,23 @@ html[data-theme='dark'] .feed-comment-input {
 html[data-theme="dark"] .feed-app {
   --feed-text: #fafafa;
   --feed-muted: #a3a3a3;
-  --feed-border: #262626;
-  --feed-bg: #0a0a0a;
+  --feed-border: #3e2a59;
+  --feed-bg: #241236;
 }
 
 html[data-theme="light"] .feed-app {
   --feed-text: #000000;
   --feed-muted: #8e8e8e;
-  --feed-border: #dbdbdb;
-  --feed-bg: #ffffff;
+  --feed-border: #eadf9d;
+  --feed-bg: #ffef1f;
 }
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme]) .feed-app {
     --feed-text: #fafafa;
     --feed-muted: #a3a3a3;
-    --feed-border: #262626;
-    --feed-bg: #0a0a0a;
+    --feed-border: #3e2a59;
+    --feed-bg: #241236;
   }
 }
 
@@ -1620,28 +1636,16 @@ html[data-theme="dark"] .profile-card {
   font-weight: 600;
   font-family: inherit;
   color: var(--feed-muted);
-  background: transparent;
+  background: #fff8cf;
   border: none;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .profile-segment-btn-active {
-  color: var(--feed-text);
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-html[data-theme="dark"] .profile-segment-btn-active {
-  background: #262626;
+  color: #2f124f;
+  background: var(--brand-yellow);
   box-shadow: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme]) .profile-segment-btn-active {
-    background: #262626;
-    box-shadow: none;
-  }
 }
 
 .profile-analytics-grid {
@@ -1733,7 +1737,7 @@ html[data-theme="dark"] .profile-segment-btn-active {
   text-decoration: none;
   border: 1px solid var(--feed-border);
   border-radius: 999px;
-  background: var(--feed-bg);
+  background: #fff8cf;
   transition:
     color 0.15s ease,
     border-color 0.15s ease,
@@ -1741,24 +1745,15 @@ html[data-theme="dark"] .profile-segment-btn-active {
 }
 
 .activity-tab:hover {
-  color: var(--feed-text);
-  border-color: var(--feed-muted);
+  color: #2f124f;
+  border-color: var(--brand-yellow);
+  background: #ffe678;
 }
 
 .activity-tab-active {
-  color: var(--feed-text);
-  border-color: var(--feed-text);
-  background: rgba(0, 0, 0, 0.04);
-}
-
-html[data-theme="dark"] .activity-tab-active {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme]) .activity-tab-active {
-    background: rgba(255, 255, 255, 0.08);
-  }
+  color: #2f124f;
+  border-color: var(--brand-yellow);
+  background: var(--brand-yellow);
 }
 
 .activity-panel {
@@ -2152,4 +2147,101 @@ html[data-theme='dark'] .create-post-preview-wrap {
 .create-post-submit:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+/* App-wide accent overrides (SJSU-inspired purple/yellow) */
+.auth-form input:focus,
+.feed-search-input:focus,
+.feed-msg-input:focus,
+.feed-comment-input:focus,
+.profile-edit-input:focus,
+.profile-edit-textarea:focus,
+.create-post-caption:focus {
+  border-color: var(--feed-accent);
+  box-shadow: 0 0 0 3px var(--feed-accent-soft);
+}
+
+.feed-icon-btn:focus-visible,
+.feed-nav-item:focus-visible,
+.profile-edit-btn:focus-visible,
+.profile-edit-panel-close:focus-visible,
+.profile-analytics-link:focus-visible {
+  outline: 2px solid var(--feed-accent);
+}
+
+.feed-msg-btn-primary,
+.feed-msg-bubble-mine,
+.feed-msg-send,
+.feed-share-send,
+.feed-comment-submit,
+.profile-edit-save,
+.create-post-camera-btn-primary,
+.create-post-submit {
+  background: var(--feed-accent);
+}
+
+.feed-msg-btn-primary:hover:not(:disabled),
+.feed-msg-send:hover:not(:disabled),
+.create-post-camera-btn-primary:hover,
+.create-post-submit:hover:not(:disabled) {
+  background: var(--feed-accent-hover);
+}
+
+.feed-msg-back,
+.profile-link-row,
+.auth-link {
+  color: var(--feed-accent);
+}
+
+.feed-avatar-fallback,
+.profile-avatar,
+.profile-edit-avatar-preview {
+  background: var(--feed-accent);
+}
+
+.profile-analytics-link:hover,
+.create-post-source-btn:hover {
+  border-color: var(--feed-accent);
+  background: var(--feed-highlight-soft);
+}
+
+.activity-tab-active {
+  color: var(--feed-accent);
+  border-color: var(--feed-accent);
+  background: var(--feed-highlight-soft);
+}
+
+/* Yellow for secondary/surface elements */
+.feed-header,
+.feed-bottom-nav {
+  background: var(--feed-accent);
+  border-color: var(--feed-accent);
+}
+
+.feed-header-brand,
+.feed-nav-item,
+.feed-header .feed-icon-btn {
+  color: #ffffff;
+}
+
+.feed-actions .feed-icon-btn {
+  color: #000000;
+}
+
+.feed-msg-start-title {
+  color: #ffffff;
+}
+
+.feed-msg-btn-secondary,
+.profile-card,
+.activity-panel,
+.create-post-preview-wrap {
+  background: var(--feed-highlight-soft);
+}
+
+.feed-post,
+.feed-comments-sheet,
+.feed-share-sheet,
+.profile-edit-panel {
+  background: #fffbe0;
 }

@@ -11,9 +11,10 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --brand-purple: #5a189a;
-  --brand-purple-dark: #451173;
-  --brand-purple-soft: rgba(90, 24, 154, 0.2);
+  /* Brand accent: dark blue */
+  --brand-purple: #1d4ed8;
+  --brand-purple-dark: #1e3a8a;
+  --brand-purple-soft: rgba(37, 99, 235, 0.2);
   --brand-yellow: #ffd60a;
   --brand-yellow-soft: #fff1a8;
 }
@@ -1216,8 +1217,8 @@ html[data-theme='dark'] .feed-comment-input {
 html[data-theme="dark"] .feed-app {
   --feed-text: #fafafa;
   --feed-muted: #a3a3a3;
-  --feed-border: #3e2a59;
-  --feed-bg: #241236;
+  --feed-border: #1e3a5f;
+  --feed-bg: #0f172a;
 }
 
 html[data-theme="light"] .feed-app {
@@ -1231,8 +1232,8 @@ html[data-theme="light"] .feed-app {
   html:not([data-theme]) .feed-app {
     --feed-text: #fafafa;
     --feed-muted: #a3a3a3;
-    --feed-border: #3e2a59;
-    --feed-bg: #241236;
+    --feed-border: #1e3a5f;
+    --feed-bg: #0f172a;
   }
 }
 
@@ -1654,7 +1655,7 @@ html[data-theme="dark"] .profile-card {
 }
 
 .profile-segment-btn-active {
-  color: #2f124f;
+  color: #0f2d5c;
   background: var(--brand-yellow);
   box-shadow: none;
 }
@@ -1756,13 +1757,13 @@ html[data-theme="dark"] .profile-card {
 }
 
 .activity-tab:hover {
-  color: #2f124f;
+  color: #0f2d5c;
   border-color: var(--brand-yellow);
   background: #ffe678;
 }
 
 .activity-tab-active {
-  color: #2f124f;
+  color: #0f2d5c;
   border-color: var(--brand-yellow);
   background: var(--brand-yellow);
 }
@@ -2160,7 +2161,7 @@ html[data-theme='dark'] .create-post-preview-wrap {
   opacity: 0.45;
 }
 
-/* App-wide accent overrides (SJSU-inspired purple/yellow) */
+/* App-wide accent overrides (blue/yellow) */
 .auth-form input:focus,
 .feed-search-input:focus,
 .feed-msg-input:focus,
@@ -2267,31 +2268,31 @@ html[data-theme="dark"] .feed-actions .feed-icon-btn {
 }
 
 html[data-theme="dark"] .feed-post {
-  border-color: #4a4a4a;
-  background: #2f2f2f;
+  border-color: #1e3a5f;
+  background: #162338;
 }
 
 html[data-theme="dark"] .feed-post-header,
 html[data-theme="dark"] .feed-post-body {
-  background: #262626;
+  background: #132033;
 }
 
 html[data-theme="dark"] .feed-post-media {
-  background: #2f2f2f;
+  background: #162338;
 }
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme]) .feed-post {
-    border-color: #4a4a4a;
-    background: #2f2f2f;
+    border-color: #1e3a5f;
+    background: #162338;
   }
 
   html:not([data-theme]) .feed-post-header,
   html:not([data-theme]) .feed-post-body {
-    background: #262626;
+    background: #132033;
   }
 
   html:not([data-theme]) .feed-post-media {
-    background: #2f2f2f;
+    background: #162338;
   }
 }

@@ -202,7 +202,7 @@ button.auth-link:hover {
   --feed-text: #000000;
   --feed-muted: #8e8e8e;
   --feed-border: #dbdbdb;
-  --feed-bg: #ffef1f;
+  --feed-bg: #000000;
   --feed-accent: var(--brand-purple);
   --feed-accent-hover: var(--brand-purple-dark);
   --feed-accent-soft: var(--brand-purple-soft);
@@ -334,7 +334,7 @@ button.auth-link:hover {
   overflow-y: auto;
   padding-bottom: calc(var(--feed-nav-h) + env(safe-area-inset-bottom, 0px));
   -webkit-overflow-scrolling: touch;
-  background: #fff200;
+  background: var(--feed-bg);
 }
 
 .feed-empty-state {
@@ -767,7 +767,7 @@ html:not([data-theme]) .feed-msg-btn-secondary {
   margin: 10px 12px;
   border: 1px solid #e8cf00;
   border-radius: 12px;
-  background: #fffde0;
+  background: #ffe95c;
   overflow: hidden;
 }
 
@@ -776,6 +776,7 @@ html:not([data-theme]) .feed-msg-btn-secondary {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
+  background: #ffe95c;
 }
 
 .feed-post-user {
@@ -827,6 +828,7 @@ html:not([data-theme]) .feed-msg-btn-secondary {
 .feed-post-body {
   padding: 8px 12px 16px;
   text-align: left;
+  background: #ffe95c;
 }
 
 .feed-actions {
@@ -1220,9 +1222,9 @@ html[data-theme="dark"] .feed-app {
 
 html[data-theme="light"] .feed-app {
   --feed-text: #000000;
-  --feed-muted: #8e8e8e;
+  --feed-muted: #000000;
   --feed-border: #eadf9d;
-  --feed-bg: #ffef1f;
+  --feed-bg: #fff200;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1234,8 +1236,17 @@ html[data-theme="light"] .feed-app {
   }
 }
 
+@media (prefers-color-scheme: light) {
+  html:not([data-theme]) .feed-app {
+    --feed-text: #000000;
+    --feed-muted: #000000;
+    --feed-border: #eadf9d;
+    --feed-bg: #fff200;
+  }
+}
+
 html[data-theme="dark"] body {
-  background: #0a0a0a;
+  background: #1f1f1f;
 }
 
 html[data-theme="light"] body {
@@ -1244,7 +1255,7 @@ html[data-theme="light"] body {
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme]) body {
-    background: #0a0a0a;
+    background: #1f1f1f;
   }
 }
 
@@ -2228,8 +2239,18 @@ html[data-theme='dark'] .create-post-preview-wrap {
   color: #000000;
 }
 
-.feed-msg-start-title {
+html[data-theme="dark"] .feed-actions .feed-icon-btn {
   color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .feed-actions .feed-icon-btn {
+    color: #ffffff;
+  }
+}
+
+.feed-msg-start-title {
+  color: var(--feed-text);
 }
 
 .feed-msg-btn-secondary,
@@ -2239,9 +2260,38 @@ html[data-theme='dark'] .create-post-preview-wrap {
   background: var(--feed-highlight-soft);
 }
 
-.feed-post,
 .feed-comments-sheet,
 .feed-share-sheet,
 .profile-edit-panel {
   background: #fffbe0;
+}
+
+html[data-theme="dark"] .feed-post {
+  border-color: #4a4a4a;
+  background: #2f2f2f;
+}
+
+html[data-theme="dark"] .feed-post-header,
+html[data-theme="dark"] .feed-post-body {
+  background: #262626;
+}
+
+html[data-theme="dark"] .feed-post-media {
+  background: #2f2f2f;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .feed-post {
+    border-color: #4a4a4a;
+    background: #2f2f2f;
+  }
+
+  html:not([data-theme]) .feed-post-header,
+  html:not([data-theme]) .feed-post-body {
+    background: #262626;
+  }
+
+  html:not([data-theme]) .feed-post-media {
+    background: #2f2f2f;
+  }
 }

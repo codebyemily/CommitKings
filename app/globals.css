@@ -24,7 +24,6 @@ body {
   min-height: 100svh;
 }
 
-<<<<<<< HEAD
 /* Login (auth) */
 .auth-root {
   --auth-bg: #f8f9fa;
@@ -37,19 +36,112 @@ body {
   --auth-footer-text: #374151;
   --auth-divider: #e5e7eb;
 
-=======
-.template {
->>>>>>> origin/main
   min-height: 100svh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 24px 20px;
+  background: var(--auth-bg);
+  color: var(--auth-text);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
   text-align: center;
 }
 
-<<<<<<< HEAD
+.auth-title {
+  margin: 0 0 8px;
+  font-size: clamp(1.75rem, 5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--auth-text);
+}
+
+.auth-subtitle {
+  margin: 0 0 32px;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--auth-muted);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--auth-text);
+  background: var(--auth-input-bg);
+  border: 1px solid var(--auth-border);
+  border-radius: 8px;
+  outline: none;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.auth-form input::placeholder {
+  color: var(--auth-muted);
+}
+
+.auth-form input:focus {
+  border-color: var(--auth-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.auth-submit {
+  margin-top: 4px;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--auth-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.auth-submit:hover {
+  background: var(--auth-primary-hover);
+}
+
+.auth-submit:focus-visible {
+  outline: 2px solid var(--auth-primary);
+  outline-offset: 2px;
+}
+
+.auth-link {
+  color: var(--auth-primary);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+a.auth-link:hover {
+  text-decoration: underline;
+}
+
+button.auth-link {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: center;
+}
+
 .auth-link.forgot {
   display: inline-block;
   margin-bottom: 24px;
@@ -1358,15 +1450,11 @@ html[data-theme="light"] body {
 }
 
 .profile-edit-avatar-letter {
-=======
-.template h1 {
-  margin: 0 0 0.5rem;
->>>>>>> origin/main
   font-size: 1.75rem;
   font-weight: 600;
+  color: #ffffff;
 }
 
-<<<<<<< HEAD
 .profile-edit-avatar-actions {
   display: flex;
   flex-direction: column;
@@ -2071,12 +2159,6 @@ html[data-theme='dark'] .create-post-preview-wrap {
 .create-post-submit:disabled {
   cursor: not-allowed;
   opacity: 0.45;
-=======
-.template p {
-  margin: 0;
-  color: #6b7280;
-  max-width: 28rem;
->>>>>>> origin/main
 }
 
 /* App-wide accent overrides (blue/yellow) */

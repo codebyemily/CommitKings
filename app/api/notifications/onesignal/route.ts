@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { sendOneSignalPushToExternalUsers } from '@/lib/notifications/onesignal'
 
 type SendNotificationBody = {
   contents: string
@@ -8,10 +9,9 @@ type SendNotificationBody = {
   includedSegments?: string[]
 }
 
-const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID
-const restApiKey = process.env.ONESIGNAL_REST_API_KEY
-
 export async function POST(request: Request) {
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID
+  const restApiKey = process.env.ONESIGNAL_REST_API_KEY
   if (!appId || !restApiKey) {
     return NextResponse.json(
       { error: 'OneSignal is not configured. Missing environment variables.' },
@@ -35,22 +35,10 @@ export async function POST(request: Request) {
     )
   }
 
-  const includeAliases =
-    body.externalUserIds && body.externalUserIds.length > 0
-      ? {
-          include_aliases: {
-            external_id: body.externalUserIds,
-          },
-          target_channel: 'push',
-        }
-      : null
+  const hasExternalUsers = Boolean(body.externalUserIds?.length)
+  const hasSegments = Boolean(body.includedSegments?.length)
 
-  const includeSegments =
-    body.includedSegments && body.includedSegments.length > 0
-      ? { included_segments: body.includedSegments }
-      : null
-
-  if (!includeAliases && !includeSegments) {
+  if (!hasExternalUsers && !hasSegments) {
     return NextResponse.json(
       {
         error:
@@ -60,13 +48,22 @@ export async function POST(request: Request) {
     )
   }
 
-  const payload = {
-    app_id: appId,
-    ...(body.headings?.trim() ? { headings: { en: body.headings.trim() } } : {}),
-    contents: { en: contents },
-    ...(body.url?.trim() ? { url: body.url.trim() } : {}),
-    ...(includeAliases ?? {}),
-    ...(includeSegments ?? {}),
+  if (hasExternalUsers) {
+    const sent = await sendOneSignalPushToExternalUsers({
+      externalUserIds: body.externalUserIds ?? [],
+      headings: body.headings,
+      contents,
+      url: body.url,
+    })
+
+    if (!sent.ok) {
+      return NextResponse.json(
+        { error: 'Failed to send OneSignal notification.', details: sent.error },
+        { status: 502 },
+      )
+    }
+
+    return NextResponse.json({ success: true })
   }
 
   const response = await fetch('https://api.onesignal.com/notifications', {
@@ -75,11 +72,15 @@ export async function POST(request: Request) {
       Authorization: `Key ${restApiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      app_id: appId,
+      included_segments: body.includedSegments,
+      ...(body.headings?.trim() ? { headings: { en: body.headings.trim() } } : {}),
+      contents: { en: contents },
+      ...(body.url?.trim() ? { url: body.url.trim() } : {}),
+    }),
   })
-
   const responseData = await response.json()
-
   if (!response.ok) {
     return NextResponse.json(
       { error: 'Failed to send OneSignal notification.', details: responseData },

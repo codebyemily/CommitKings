@@ -1870,6 +1870,28 @@ html[data-theme="dark"] .profile-card {
   text-decoration: underline;
 }
 
+.profile-notification-btn {
+  border: 1px solid var(--feed-border);
+  border-radius: 999px;
+  background: var(--feed-bg);
+  color: var(--feed-text);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  min-width: 90px;
+  cursor: pointer;
+}
+
+.profile-notification-btn:hover:not(:disabled) {
+  background: var(--feed-bg-soft);
+}
+
+.profile-notification-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .profile-card-signout {
   padding: 12px 16px;
   background: transparent;

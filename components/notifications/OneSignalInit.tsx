@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import OneSignal from 'react-onesignal'
+import { createClient } from '@/lib/supabase/client'
 
 export default function OneSignalInit() {
   useEffect(() => {
@@ -18,6 +19,26 @@ export default function OneSignalInit() {
           allowLocalhostAsSecureOrigin: true,
           serviceWorkerPath: '/OneSignalSDKWorker.js',
           serviceWorkerUpdaterPath: '/OneSignalSDKUpdaterWorker.js',
+        })
+
+        const supabase = createClient()
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+
+        if (user?.id) {
+          await OneSignal.login(user.id)
+        } else {
+          await OneSignal.logout()
+        }
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+          const nextUserId = session?.user?.id
+          if (nextUserId) {
+            void OneSignal.login(nextUserId)
+          } else {
+            void OneSignal.logout()
+          }
         })
       } catch (error) {
         console.error('OneSignal init failed', error)

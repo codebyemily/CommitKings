@@ -5,6 +5,7 @@ import { BottomNav } from '@/components/feed/BottomNav'
 import { SignOutButton } from '@/components/auth/SignOutButton'
 import { ProfileAppearance } from './ProfileAppearance'
 import { ProfileEditButton } from './ProfileEditButton'
+import { ProfileNotifications } from './ProfileNotifications'
 
 type ProfileScreenProps = {
   email: string
@@ -72,6 +73,10 @@ export function ProfileScreen({
 
         <section className="profile-card">
           <ProfileAppearance />
+        </section>
+
+        <section className="profile-card">
+          <ProfileNotifications />
         </section>
 
         <section className="profile-card">

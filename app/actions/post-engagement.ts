@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthorIdentityFromProfile } from '@/lib/data/profile-identity'
 import { engagementSchemaErrorMessage } from '@/lib/posts/schema-fallback'
+import { sendOneSignalPushToExternalUsers } from '@/lib/notifications/onesignal'
 import { revalidatePath } from 'next/cache'
 
 export type ToggleLikeResult =
@@ -78,7 +79,7 @@ export async function togglePostLikeAction(postId: string): Promise<ToggleLikeRe
 
   const { data: post, error: postError } = await supabase
     .from('posts')
-    .select('likes_count')
+    .select('likes_count, user_id, author_username')
     .eq('id', trimmed)
     .maybeSingle()
 
@@ -86,6 +87,19 @@ export async function togglePostLikeAction(postId: string): Promise<ToggleLikeRe
     return {
       ok: false,
       error: engagementSchemaErrorMessage(postError?.message ?? 'Post not found.'),
+    }
+  }
+
+  if (!existing && post.user_id !== user.id) {
+    const { username } = await getAuthorIdentityFromProfile(supabase, user)
+    const pushResult = await sendOneSignalPushToExternalUsers({
+      externalUserIds: [post.user_id],
+      headings: 'New like',
+      contents: `@${username} liked your post.`,
+      url: `/home?post=${trimmed}`,
+    })
+    if (!pushResult.ok) {
+      console.error('OneSignal like notification failed:', pushResult.error)
     }
   }
 
@@ -142,6 +156,25 @@ export async function addPostCommentAction(
       error: engagementSchemaErrorMessage(
         error?.message ?? 'Could not add comment.',
       ),
+    }
+  }
+
+  const { data: postOwner } = await supabase
+    .from('posts')
+    .select('user_id')
+    .eq('id', trimmedId)
+    .maybeSingle()
+
+  if (postOwner?.user_id && postOwner.user_id !== user.id) {
+    const preview = text.length > 90 ? `${text.slice(0, 90)}...` : text
+    const pushResult = await sendOneSignalPushToExternalUsers({
+      externalUserIds: [postOwner.user_id],
+      headings: 'New comment',
+      contents: `@${username} commented on your post: "${preview}"`,
+      url: `/home?post=${trimmedId}`,
+    })
+    if (!pushResult.ok) {
+      console.error('OneSignal comment notification failed:', pushResult.error)
     }
   }
 

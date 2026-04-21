@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
+import { sendDirectMessageAction } from '@/app/actions/messages'
 import { decodeSharedPostMessage } from '@/lib/messages/share'
 import type { DirectMessageRow } from '@/lib/messages/types'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
@@ -88,29 +89,14 @@ export function ConversationThreadClient({
     if (!text || sending) return
     setSendError(null)
     setSending(true)
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('direct_messages')
-      .insert({
-        conversation_id: conversationId,
-        sender_id: currentUserId,
-        body: text,
-      })
-      .select('id, conversation_id, sender_id, body, created_at')
-      .single()
 
     setSending(false)
-    if (error) {
-      setSendError(error.message)
+    const result = await sendDirectMessageAction({ conversationId, body: text })
+    if (!result.ok) {
+      setSendError(result.error)
       return
     }
-    if (data) {
-      setBody('')
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === data.id)) return prev
-        return [...prev, data as DirectMessageRow]
-      })
-    }
+    setBody('')
   }
 
   const onSubmitForm = (e: React.FormEvent) => {

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import path from 'path'
 
 let supabaseHost: string | undefined
 try {
@@ -9,6 +10,15 @@ try {
 }
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: path.join(__dirname),
+  async rewrites() {
+    return [
+      {
+        source: '/onesignal/OneSignalSDK.sw.js',
+        destination: 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js',
+      },
+    ]
+  },
   async redirects() {
     return [
       {

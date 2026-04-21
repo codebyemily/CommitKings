@@ -63,12 +63,15 @@ async function insertDirectMessageAndNotify(input: {
       : 'user'
   const preview =
     input.body.length > 90 ? `${input.body.slice(0, 90)}...` : input.body
-  void sendOneSignalPushToExternalUsers({
+  const pushResult = await sendOneSignalPushToExternalUsers({
     externalUserIds: [recipientId],
     headings: 'New message',
     contents: `@${username}: ${preview}`,
     url: `/messages/${input.conversationId}`,
   })
+  if (!pushResult.ok) {
+    console.error('OneSignal message notification failed:', pushResult.error)
+  }
 
   return { ok: true }
 }

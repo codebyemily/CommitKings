@@ -47,7 +47,9 @@ export default async function ProfilePage() {
   const avatarPathRaw =
     (typeof profile?.avatar_path === 'string' && profile.avatar_path.trim()) ||
     (typeof meta?.avatar_path === 'string' ? meta.avatar_path.trim() : '')
-  const avatarUrl = avatarPathRaw ? getPostImagePublicUrl(avatarPathRaw) : null
+  const avatarUrl = avatarPathRaw
+    ? getPostImagePublicUrl(avatarPathRaw) || null
+    : null
 
   const friendsCount = await getMutualFriendsCount(user.id)
 

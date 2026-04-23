@@ -17,11 +17,8 @@ type Props = {
 
 function peerAvatarSrc(path: string | null): string | null {
   if (!path?.trim()) return null
-  try {
-    return getPostImagePublicUrl(path.trim())
-  } catch {
-    return null
-  }
+  const url = getPostImagePublicUrl(path.trim())
+  return url || null
 }
 
 function formatListTime(iso: string | null): string {

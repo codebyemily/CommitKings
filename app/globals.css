@@ -716,6 +716,14 @@ a.feed-msg-thread-peer-link:focus-visible {
   object-fit: cover;
 }
 
+.feed-msg-shared-image-placeholder {
+  min-height: 120px;
+  max-width: 220px;
+  margin: 8px 0;
+  border-radius: 10px;
+  background: #e5e7eb;
+}
+
 .feed-msg-meta {
   display: block;
   margin-top: 6px;
@@ -891,6 +899,12 @@ a.feed-post-user-link:focus-visible {
 
 .feed-post-image {
   object-fit: cover;
+}
+
+.feed-post-media-placeholder {
+  position: absolute;
+  inset: 0;
+  background: #e5e7eb;
 }
 
 .feed-post-body {
@@ -2159,6 +2173,14 @@ html[data-theme="dark"] .profile-card {
 .activity-post-thumb {
   border-radius: 8px;
   object-fit: cover;
+}
+
+.activity-post-thumb-placeholder {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  background: #e5e7eb;
 }
 
 .activity-post-copy {

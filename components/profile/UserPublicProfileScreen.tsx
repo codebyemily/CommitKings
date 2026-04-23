@@ -32,9 +32,11 @@ export function UserPublicProfileScreen({
     profile.displayName.charAt(0).toUpperCase() ||
     profile.username.charAt(0).toUpperCase() ||
     '?'
-  const avatarUrl = profile.avatarPath
-    ? getPostImagePublicUrl(profile.avatarPath)
-    : null
+  const avatarPathTrimmed = profile.avatarPath?.trim() ?? ''
+  const avatarBuilt = avatarPathTrimmed
+    ? getPostImagePublicUrl(avatarPathTrimmed)
+    : ''
+  const avatarUrl = avatarBuilt || null
   const bioText = profile.bio.trim()
   const messageHref = `/messages?with=${encodeURIComponent(profile.username)}`
 

@@ -14,11 +14,8 @@ type Props = {
 
 function rowAvatarSrc(path: string | null): string | null {
   if (!path?.trim()) return null
-  try {
-    return getPostImagePublicUrl(path.trim())
-  } catch {
-    return null
-  }
+  const url = getPostImagePublicUrl(path.trim())
+  return url || null
 }
 
 export function FollowingListRow({ person }: Props) {

@@ -64,14 +64,22 @@ export function FeedPost({
       ) : null}
 
       <div className="feed-post-media">
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          fill
-          sizes="100vw"
-          className="feed-post-image"
-          priority={imagePriority ?? false}
-        />
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            fill
+            sizes="100vw"
+            className="feed-post-image"
+            priority={imagePriority ?? false}
+          />
+        ) : (
+          <div
+            className="feed-post-media-placeholder"
+            role="img"
+            aria-label={imageAlt}
+          />
+        )}
       </div>
 
       <FeedPostEngagement

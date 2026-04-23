@@ -20,11 +20,8 @@ type Props = {
 
 function avatarSrc(path: string | null): string | null {
   if (!path?.trim()) return null
-  try {
-    return getPostImagePublicUrl(path.trim())
-  } catch {
-    return null
-  }
+  const url = getPostImagePublicUrl(path.trim())
+  return url || null
 }
 
 function formatMsgTime(iso: string): string {
@@ -154,14 +151,30 @@ export function ConversationThreadClient({
                     {sharedPost ? (
                       <div>
                         <p className="feed-msg-text">Shared a post</p>
-                        <Image
-                          src={sharedPost.imageSrc}
-                          alt={sharedPost.caption ? sharedPost.caption.slice(0, 120) : 'Shared post'}
-                          width={220}
-                          height={220}
-                          className="feed-msg-shared-image"
-                          unoptimized
-                        />
+                        {sharedPost.imageSrc ? (
+                          <Image
+                            src={sharedPost.imageSrc}
+                            alt={
+                              sharedPost.caption
+                                ? sharedPost.caption.slice(0, 120)
+                                : 'Shared post'
+                            }
+                            width={220}
+                            height={220}
+                            className="feed-msg-shared-image"
+                            unoptimized
+                          />
+                        ) : (
+                          <div
+                            className="feed-msg-shared-image feed-msg-shared-image-placeholder"
+                            role="img"
+                            aria-label={
+                              sharedPost.caption
+                                ? sharedPost.caption.slice(0, 120)
+                                : 'Shared post'
+                            }
+                          />
+                        )}
                         <p className="feed-msg-text">
                           <strong>@{sharedPost.authorUsername}</strong> {sharedPost.caption}
                         </p>

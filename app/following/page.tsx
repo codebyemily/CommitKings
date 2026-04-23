@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { FollowingScreen } from '@/components/feed/FollowingScreen'
+import { getFriendsList } from '@/lib/data/follows'
 
 export const metadata: Metadata = {
-  title: 'Following',
+  title: 'Friends',
 }
 
 export default async function FollowingPage() {
@@ -17,5 +18,7 @@ export default async function FollowingPage() {
     redirect('/login')
   }
 
-  return <FollowingScreen />
+  const friends = await getFriendsList(user.id)
+
+  return <FollowingScreen items={friends} />
 }

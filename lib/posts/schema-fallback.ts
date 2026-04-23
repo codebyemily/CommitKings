@@ -55,6 +55,28 @@ export function isMissingPostSavesTable(message: string): boolean {
   )
 }
 
+/** Before migration `20260424120000_follows.sql` is applied. */
+export function isMissingFollowsTable(message: string): boolean {
+  const m = message.toLowerCase()
+  if (!m.includes('follows')) return false
+  return (
+    m.includes('does not exist') ||
+    m.includes('schema cache') ||
+    m.includes('could not find')
+  )
+}
+
+/** Before migration `20260425120000_follow_requests.sql` is applied. */
+export function isMissingFollowRequestsTable(message: string): boolean {
+  const m = message.toLowerCase()
+  if (!m.includes('follow_requests')) return false
+  return (
+    m.includes('does not exist') ||
+    m.includes('schema cache') ||
+    m.includes('could not find')
+  )
+}
+
 const LIKES_COMMENTS_MIGRATION = '20260410140000_post_likes_and_comments.sql'
 
 /** User-facing hint when engagement tables are missing from the remote DB. */

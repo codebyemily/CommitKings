@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
 import { redirect } from 'next/navigation'
 import { ProfileScreen } from '@/components/profile/ProfileScreen'
+import { getMutualFriendsCount } from '@/lib/data/follows'
 
 export const metadata: Metadata = {
   title: 'Profile',
@@ -48,6 +49,8 @@ export default async function ProfilePage() {
     (typeof meta?.avatar_path === 'string' ? meta.avatar_path.trim() : '')
   const avatarUrl = avatarPathRaw ? getPostImagePublicUrl(avatarPathRaw) : null
 
+  const friendsCount = await getMutualFriendsCount(user.id)
+
   return (
     <ProfileScreen
       email={user.email ?? ''}
@@ -55,6 +58,7 @@ export default async function ProfilePage() {
       handle={handle}
       bio={bio}
       avatarUrl={avatarUrl}
+      friendsCount={friendsCount}
     />
   )
 }

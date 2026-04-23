@@ -13,6 +13,7 @@ type Props = {
   conversationId: string
   currentUserId: string
   peerDisplayName: string
+  peerUsername: string
   peerAvatarPath: string | null
   initialMessages: DirectMessageRow[]
 }
@@ -35,6 +36,7 @@ export function ConversationThreadClient({
   conversationId,
   currentUserId,
   peerDisplayName,
+  peerUsername,
   peerAvatarPath,
   initialMessages,
 }: Props) {
@@ -113,7 +115,10 @@ export function ConversationThreadClient({
         <Link href="/messages" className="feed-msg-back">
           ← Messages
         </Link>
-        <div className="feed-msg-thread-peer">
+        <Link
+          href={`/u/${encodeURIComponent(peerUsername)}`}
+          className="feed-msg-thread-peer feed-msg-thread-peer-link"
+        >
           {peerSrc ? (
             <Image
               src={peerSrc}
@@ -129,7 +134,7 @@ export function ConversationThreadClient({
             </span>
           )}
           <span className="feed-msg-thread-name">{peerDisplayName}</span>
-        </div>
+        </Link>
       </header>
 
       <div className="feed-msg-scroll" role="log" aria-live="polite">

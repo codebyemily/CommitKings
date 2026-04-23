@@ -13,6 +13,7 @@ type ProfileScreenProps = {
   handle: string
   bio: string
   avatarUrl: string | null
+  friendsCount: number
 }
 
 const ANALYTICS_LINKS = [
@@ -28,6 +29,7 @@ export function ProfileScreen({
   handle,
   bio,
   avatarUrl,
+  friendsCount,
 }: ProfileScreenProps) {
   const initial = displayName.charAt(0).toUpperCase() || email.charAt(0).toUpperCase() || '?'
   const bioText = bio.trim()
@@ -58,6 +60,12 @@ export function ProfileScreen({
           </div>
           <h2 className="profile-name">{displayName}</h2>
           <p className="profile-handle">@{handle}</p>
+          <p className="profile-friends-count" aria-label="Friends">
+            <span className="profile-friends-count-num">{friendsCount}</span>
+            <span className="profile-friends-count-label">
+              {friendsCount === 1 ? 'friend' : 'friends'}
+            </span>
+          </p>
           <p className="profile-bio">
             {bioText
               ? bioText

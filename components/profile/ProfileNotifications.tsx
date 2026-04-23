@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import OneSignal from 'react-onesignal'
 import {
   ensureOneSignalReady,
+  getOneSignalDiagnostics,
   syncOneSignalUserAlias,
+  type OneSignalDiagnostics,
 } from '@/lib/notifications/onesignal-client'
 
 type PermissionState = 'unsupported' | 'default' | 'granted' | 'denied'
@@ -64,6 +66,7 @@ export function ProfileNotifications() {
   const [subscribed, setSubscribed] = useState<boolean | null>(null)
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [diag, setDiag] = useState<OneSignalDiagnostics | null>(null)
 
   useEffect(() => {
     setPermission(readPermission())
@@ -114,6 +117,7 @@ export function ProfileNotifications() {
 
     setPending(true)
     setMessage(null)
+    setDiag(null)
     try {
       const initTimeoutMs = 12000
       const initTimeout = new Promise<{ ok: false; error: string }>((resolve) => {
@@ -131,8 +135,7 @@ export function ProfileNotifications() {
       if (!ready.ok) {
         setMessage(ready.error)
         if (ready.error.toLowerCase().includes('timed out')) {
-          const d = await getOneSignalDiagnostics()
-          setDiag(d)
+          setDiag(await getOneSignalDiagnostics())
         }
         return
       }
@@ -309,6 +312,12 @@ export function ProfileNotifications() {
         Current status: {subscribed === null ? 'Unknown' : subscribed ? 'Subscribed' : 'Disabled'}
       </p>
       {message ? <p className="profile-hint">{message}</p> : null}
+      {diag ? (
+        <details className="profile-hint">
+          <summary>Technical details</summary>
+          <pre className="profile-diag-pre">{JSON.stringify(diag, null, 2)}</pre>
+        </details>
+      ) : null}
     </div>
   )
 }

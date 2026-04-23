@@ -22,6 +22,8 @@ export async function sendOneSignalPushToExternalUsers(
     return { ok: false, error: 'OneSignal is not configured.' }
   }
 
+  const { appId, restApiKey } = config
+
   const recipients = input.externalUserIds.map((id) => id.trim()).filter(Boolean)
   if (!recipients.length) {
     return { ok: false, error: 'No recipients provided.' }
@@ -39,12 +41,12 @@ export async function sendOneSignalPushToExternalUsers(
     const response = await fetch('https://api.onesignal.com/notifications', {
       method: 'POST',
       headers: {
-        Authorization: `Key ${config.restApiKey}`,
+        Authorization: `Key ${restApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
     })
-    let data: any = null
+    let data: unknown = null
     try {
       data = await response.json()
     } catch {
@@ -53,12 +55,26 @@ export async function sendOneSignalPushToExternalUsers(
     return { response, data }
   }
 
-  function parseRecipientsCount(data: any): number | null {
+  function parseRecipientsCount(data: unknown): number | null {
     if (!data || typeof data !== 'object' || !('recipients' in data)) {
       return null
     }
     const raw = (data as { recipients?: unknown }).recipients
     return typeof raw === 'number' && Number.isFinite(raw) ? raw : null
+  }
+
+  function parseOneSignalErrorMessage(data: unknown): string | undefined {
+    if (!data || typeof data !== 'object') {
+      return undefined
+    }
+    const o = data as { errors?: unknown; error?: unknown }
+    if (Array.isArray(o.errors) && o.errors.every((e) => typeof e === 'string')) {
+      return o.errors.join(', ')
+    }
+    if (typeof o.error === 'string') {
+      return o.error
+    }
+    return undefined
   }
 
   function buildUserTagFilters(ids: string[]) {
@@ -80,7 +96,7 @@ export async function sendOneSignalPushToExternalUsers(
   try {
     // New User Model payload (aliases + target_channel).
     const primary = await sendWithBody({
-      app_id: config.appId,
+      app_id: appId,
       include_aliases: {
         external_id: recipients,
       },
@@ -98,7 +114,7 @@ export async function sendOneSignalPushToExternalUsers(
 
     // Legacy fallback payload for older OneSignal app setups.
     const fallback = await sendWithBody({
-      app_id: config.appId,
+      app_id: appId,
       include_external_user_ids: recipients,
       channel_for_external_user_ids: 'push',
       ...(headings ? { headings: { en: headings } } : {}),
@@ -114,7 +130,7 @@ export async function sendOneSignalPushToExternalUsers(
 
     // Tag-based fallback for users whose alias mapping is missing.
     const tagged = await sendWithBody({
-      app_id: config.appId,
+      app_id: appId,
       filters: buildUserTagFilters(recipients),
       target_channel: 'push',
       ...(headings ? { headings: { en: headings } } : {}),
@@ -132,12 +148,9 @@ export async function sendOneSignalPushToExternalUsers(
     return {
       ok: false,
       error:
-        primary.data?.errors?.join(', ') ||
-        primary.data?.error ||
-        fallback.data?.errors?.join(', ') ||
-        fallback.data?.error ||
-        tagged.data?.errors?.join(', ') ||
-        tagged.data?.error ||
+        parseOneSignalErrorMessage(primary.data) ||
+        parseOneSignalErrorMessage(fallback.data) ||
+        parseOneSignalErrorMessage(tagged.data) ||
         'OneSignal request failed.',
     }
   } catch (error) {

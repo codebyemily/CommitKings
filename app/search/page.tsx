@@ -17,5 +17,5 @@ export default async function SearchPage() {
     redirect('/login')
   }
 
-  return <SearchScreen />
+  return <SearchScreen viewerId={user.id} />
 }

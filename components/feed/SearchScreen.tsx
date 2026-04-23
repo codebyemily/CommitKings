@@ -86,9 +86,10 @@ export function SearchScreen({ viewerId }: SearchScreenProps) {
                 const initial = (hit.displayName || hit.username)
                   .slice(0, 1)
                   .toUpperCase()
-                const withParam = encodeURIComponent(hit.username)
                 const isSelf = hit.id === viewerId
-                const href = isSelf ? '/profile' : `/messages?with=${withParam}`
+                const href = isSelf
+                  ? '/profile'
+                  : `/u/${encodeURIComponent(hit.username)}`
                 return (
                   <li key={hit.id}>
                     <Link href={href} className="feed-search-hit-row">
@@ -116,7 +117,7 @@ export function SearchScreen({ viewerId }: SearchScreenProps) {
                         </div>
                         <p className="feed-search-hit-handle">@{hit.username}</p>
                         <p className="feed-search-hit-action">
-                          {isSelf ? 'Your profile' : 'Open messages'}
+                          {isSelf ? 'Your profile' : 'View profile'}
                         </p>
                       </div>
                     </Link>

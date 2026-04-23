@@ -65,6 +65,7 @@ export default async function ConversationPage({ params }: Props) {
           conversationId={conversationId}
           currentUserId={user.id}
           peerDisplayName={peer.displayName}
+          peerUsername={peer.username}
           peerAvatarPath={peer.avatarPath}
           initialMessages={loaded.messages}
         />

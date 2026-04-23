@@ -1,6 +1,10 @@
 import { UserPublicProfileScreen } from '@/components/profile/UserPublicProfileScreen'
 import { createClient } from '@/lib/supabase/server'
-import { getMutualFriendsCount, viewerFollowsUser } from '@/lib/data/follows'
+import {
+  getMutualFriendsCount,
+  viewerFriendsWithUser,
+  viewerOutgoingFollowRequest,
+} from '@/lib/data/follows'
 import { getPostsForUserId } from '@/lib/data/feed'
 import { getPublicProfileByUsername } from '@/lib/data/profile-public'
 import type { Metadata } from 'next'
@@ -63,10 +67,15 @@ export default async function PublicUserProfilePage({ params }: Props) {
     avatarStoragePath: avatarPathRaw || null,
   })
 
-  const initialFollowing =
+  const initialFriends =
     profile.id === user.id
       ? false
-      : await viewerFollowsUser(user.id, profile.id)
+      : await viewerFriendsWithUser(user.id, profile.id)
+
+  const initialOutgoingRequest =
+    profile.id === user.id
+      ? false
+      : await viewerOutgoingFollowRequest(user.id, profile.id)
 
   const friendsCount = await getMutualFriendsCount(profile.id)
 
@@ -75,7 +84,8 @@ export default async function PublicUserProfilePage({ params }: Props) {
       profile={profile}
       posts={posts}
       viewerId={user.id}
-      initialFollowing={initialFollowing}
+      initialFriends={initialFriends}
+      initialOutgoingRequest={initialOutgoingRequest}
       pathUsername={pathUsername}
       friendsCount={friendsCount}
     />

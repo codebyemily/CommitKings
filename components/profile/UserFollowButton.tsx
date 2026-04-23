@@ -2,27 +2,26 @@
 
 import { toggleFollowAction } from '@/app/actions/follows'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 
 type Props = {
   targetUserId: string
   usernameForPath: string
-  initialFollowing: boolean
+  initialFriends: boolean
+  initialOutgoingRequest: boolean
 }
 
 export function UserFollowButton({
   targetUserId,
   usernameForPath,
-  initialFollowing,
+  initialFriends,
+  initialOutgoingRequest,
 }: Props) {
   const router = useRouter()
-  const [following, setFollowing] = useState(initialFollowing)
+  const [friends, setFriends] = useState(initialFriends)
+  const [outgoingRequest, setOutgoingRequest] = useState(initialOutgoingRequest)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
-
-  useEffect(() => {
-    setFollowing(initialFollowing)
-  }, [initialFollowing])
 
   const onClick = () => {
     setError(null)
@@ -32,7 +31,8 @@ export function UserFollowButton({
         usernameForPath,
       })
       if (r.ok) {
-        setFollowing(r.following)
+        setFriends(r.friends)
+        setOutgoingRequest(r.outgoingRequest)
         router.refresh()
       } else {
         setError(r.error)
@@ -40,19 +40,30 @@ export function UserFollowButton({
     })
   }
 
+  const label = pending
+    ? '…'
+    : friends
+      ? 'Friends'
+      : outgoingRequest
+        ? 'Request sent'
+        : 'Add friend'
+
+  const btnClass = friends
+    ? 'user-public-btn user-public-btn--friends'
+    : outgoingRequest
+      ? 'user-public-btn user-public-btn--requested'
+      : 'user-public-btn user-public-btn--primary'
+
   return (
     <div className="user-public-follow-wrap">
       <button
         type="button"
-        className={
-          following
-            ? 'user-public-btn user-public-btn--following'
-            : 'user-public-btn user-public-btn--primary'
-        }
+        className={btnClass}
         onClick={() => void onClick()}
-        disabled={pending}
+        disabled={pending || friends}
+        title={friends ? 'You are friends' : undefined}
       >
-        {pending ? '…' : following ? 'Following' : 'Follow'}
+        {label}
       </button>
       {error ? (
         <p className="user-public-inline-error" role="alert">

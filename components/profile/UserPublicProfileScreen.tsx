@@ -3,6 +3,7 @@ import type { PublicProfile } from '@/lib/data/profile-public'
 import { BottomNav } from '@/components/feed/BottomNav'
 import { FeedHeader } from '@/components/feed/FeedHeader'
 import { UserFollowButton } from '@/components/profile/UserFollowButton'
+import { UserRemoveFriendButton } from '@/components/profile/UserRemoveFriendButton'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,7 +12,8 @@ type Props = {
   profile: PublicProfile
   posts: FeedPostData[]
   viewerId: string
-  initialFollowing: boolean
+  initialFriends: boolean
+  initialOutgoingRequest: boolean
   pathUsername: string
   friendsCount: number
 }
@@ -20,7 +22,8 @@ export function UserPublicProfileScreen({
   profile,
   posts,
   viewerId,
-  initialFollowing,
+  initialFriends,
+  initialOutgoingRequest,
   pathUsername,
   friendsCount,
 }: Props) {
@@ -82,9 +85,11 @@ export function UserPublicProfileScreen({
           ) : (
             <div className="user-public-actions">
               <UserFollowButton
+                key={`${profile.id}-${initialFriends}-${initialOutgoingRequest}`}
                 targetUserId={profile.id}
                 usernameForPath={pathUsername}
-                initialFollowing={initialFollowing}
+                initialFriends={initialFriends}
+                initialOutgoingRequest={initialOutgoingRequest}
               />
               <Link
                 href={messageHref}
@@ -92,6 +97,13 @@ export function UserPublicProfileScreen({
               >
                 Message
               </Link>
+              {initialFriends ? (
+                <UserRemoveFriendButton
+                  key={`remove-${profile.id}`}
+                  otherUserId={profile.id}
+                  usernameForPath={pathUsername}
+                />
+              ) : null}
             </div>
           )}
         </section>

@@ -19,6 +19,7 @@ import {
   IconSend,
 } from './FeedIcons'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useCallback, useState } from 'react'
 
 export type CommentRow = {
@@ -280,7 +281,16 @@ export function FeedPostEngagement({
       </p>
 
       <p className="feed-caption">
-        <span className="feed-username feed-caption-user">{captionAuthorLabel}</span>{' '}
+        {shareAuthorUsername.trim() ? (
+          <Link
+            href={`/u/${encodeURIComponent(shareAuthorUsername)}`}
+            className="feed-username feed-caption-user feed-profile-author-link"
+          >
+            {captionAuthorLabel}
+          </Link>
+        ) : (
+          <span className="feed-username feed-caption-user">{captionAuthorLabel}</span>
+        )}{' '}
         <span className="feed-caption-text">{caption}</span>
       </p>
 
@@ -330,7 +340,16 @@ export function FeedPostEngagement({
                 <ul className="feed-comments-list">
                   {comments.map((c) => (
                     <li key={c.id} className="feed-comment-item">
-                      <span className="feed-comment-author">{c.author_display_name}</span>{' '}
+                      {c.author_username?.trim() ? (
+                        <Link
+                          href={`/u/${encodeURIComponent(c.author_username.trim())}`}
+                          className="feed-comment-author feed-profile-author-link"
+                        >
+                          {c.author_display_name}
+                        </Link>
+                      ) : (
+                        <span className="feed-comment-author">{c.author_display_name}</span>
+                      )}{' '}
                       <span className="feed-comment-body">{c.body}</span>
                       <span className="feed-comment-time">{formatCommentTime(c.created_at)}</span>
                     </li>

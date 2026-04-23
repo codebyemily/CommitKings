@@ -938,6 +938,20 @@ a.feed-post-user-link:focus-visible {
   font-weight: 400;
 }
 
+a.feed-profile-author-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+a.feed-profile-author-link:hover {
+  opacity: 0.88;
+}
+
+a.feed-profile-author-link:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .feed-view-comments {
   display: block;
   margin: 0 0 8px;
@@ -1384,6 +1398,23 @@ html[data-theme="light"] body {
   color: var(--feed-muted);
 }
 
+.profile-follow-stats {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--feed-text);
+}
+
+.profile-follow-stats-num {
+  font-weight: 800;
+}
+
+.profile-follow-stats-sep {
+  margin: 0 6px;
+  color: var(--feed-muted);
+  font-weight: 400;
+}
+
 .profile-friends-count {
   margin: 0 0 12px;
   font-size: 0.875rem;
@@ -1815,6 +1846,139 @@ html[data-theme="dark"] .profile-card {
   background: #fef2f2;
   border-color: #fecaca;
   color: #b91c1c;
+}
+
+.user-public-btn--friends {
+  color: var(--feed-text);
+  background: #fafafa;
+  border-color: var(--feed-border);
+}
+
+.user-public-btn--friends:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.user-public-btn--requested {
+  color: var(--feed-muted);
+  background: #fafafa;
+  border-color: var(--feed-border);
+}
+
+.user-public-btn--requested:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.follow-requests-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0 16px 24px;
+}
+
+.follow-requests-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--feed-border);
+}
+
+.follow-requests-row:last-child {
+  border-bottom: none;
+}
+
+.follow-requests-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+}
+
+.follow-requests-user:hover {
+  opacity: 0.92;
+}
+
+.follow-requests-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.follow-requests-btn {
+  min-width: 5.5rem;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+}
+
+.following-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0 12px 24px;
+}
+
+.following-list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--feed-border);
+}
+
+.following-list-row:last-child {
+  border-bottom: none;
+}
+
+.following-list-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+}
+
+.following-list-main:hover {
+  opacity: 0.92;
+}
+
+.following-list-counts {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: var(--feed-muted);
+}
+
+.following-list-counts-sep {
+  margin: 0 6px;
+}
+
+.following-list-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.following-list-unfollow {
+  min-width: 6.5rem;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+}
+
+.following-list-row-error {
+  max-width: 11rem;
+  text-align: right;
 }
 
 .user-public-posts {

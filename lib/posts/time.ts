@@ -3,6 +3,14 @@ export function formatPostTime(iso: string): string {
   if (Number.isNaN(d.getTime())) return ''
 
   const diffMs = Date.now() - d.getTime()
+
+  // Future timestamps: negative relative deltas would read wrong (e.g. "-5s ago").
+  if (diffMs < 0) {
+    const skewMs = 120_000
+    if (diffMs > -skewMs) return 'just now'
+    return d.toISOString().slice(0, 10)
+  }
+
   const sec = Math.floor(diffMs / 1000)
   if (sec < 10) return 'just now'
   if (sec < 60) return `${sec}s ago`

@@ -43,14 +43,22 @@ export function ActivityScreen({ tab, items }: ActivityScreenProps) {
             <ul className="activity-post-list" aria-label={`${panel.label} posts`}>
               {items.map((item) => (
                 <li key={`${item.postId}-${item.activityAt}`} className="activity-post-row">
-                  <Image
-                    src={item.imageSrc}
-                    alt={item.caption ? item.caption.slice(0, 120) : 'Post'}
-                    width={56}
-                    height={56}
-                    className="activity-post-thumb"
-                    unoptimized
-                  />
+                  {item.imageSrc ? (
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.caption ? item.caption.slice(0, 120) : 'Post'}
+                      width={56}
+                      height={56}
+                      className="activity-post-thumb"
+                      unoptimized
+                    />
+                  ) : (
+                    <div
+                      className="activity-post-thumb activity-post-thumb-placeholder"
+                      role="img"
+                      aria-label={item.caption ? item.caption.slice(0, 120) : 'Post'}
+                    />
+                  )}
                   <div className="activity-post-copy">
                     <p className="activity-post-caption">
                       <span className="activity-post-user">@{item.authorUsername}</span>{' '}

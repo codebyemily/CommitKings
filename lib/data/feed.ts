@@ -134,7 +134,9 @@ async function queryFeedPosts(options: FeedQueryOptions): Promise<FeedPostData[]
       savedByViewer: viewer?.userId ? savedIds.has(id) : false,
       caption,
       timeAgo: formatPostTime(createdAt),
-      avatarSrc: path ? getPostImagePublicUrl(path) : undefined,
+      avatarSrc: path?.trim()
+        ? getPostImagePublicUrl(path.trim()) || undefined
+        : undefined,
       imagePriority: index === 0,
     }
   })

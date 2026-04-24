@@ -19,9 +19,15 @@ const POSTS_SELECT_BASE = `${POSTS_SELECT_CORE}, comments_count`
 const POSTS_SELECT_WITH_AVATAR = `${POSTS_SELECT_BASE}, author_avatar_path`
 const POSTS_SELECT_WITH_AVATAR_NO_COMMENTS = `${POSTS_SELECT_CORE}, author_avatar_path`
 
-export async function getFeedPosts(
-  viewer?: FeedViewerContext | null,
-): Promise<FeedPostData[]> {
+type FeedQueryOptions = {
+  viewer?: FeedViewerContext | null
+  /** When set, only posts by this user. */
+  authorUserId?: string
+  limit: number
+}
+
+async function queryFeedPosts(options: FeedQueryOptions): Promise<FeedPostData[]> {
+  const { viewer, authorUserId, limit } = options
   const supabase = await createClient()
 
   const selectAttempts = [
@@ -35,11 +41,11 @@ export async function getFeedPosts(
   let lastError: { message: string } | null = null
 
   for (const sel of selectAttempts) {
-    const res = await supabase
-      .from('posts')
-      .select(sel)
-      .order('created_at', { ascending: false })
-      .limit(100)
+    let q = supabase.from('posts').select(sel)
+    if (authorUserId) {
+      q = q.eq('user_id', authorUserId)
+    }
+    const res = await q.order('created_at', { ascending: false }).limit(limit)
     if (!res.error) {
       data = (res.data ?? []) as unknown as Record<string, unknown>[]
       break
@@ -48,7 +54,7 @@ export async function getFeedPosts(
   }
 
   if (!data && lastError) {
-    console.error('getFeedPosts:', lastError.message)
+    console.error('queryFeedPosts:', lastError.message)
     return []
   }
 
@@ -58,30 +64,35 @@ export async function getFeedPosts(
   let likedIds = new Set<string>()
   let savedIds = new Set<string>()
   if (viewer?.userId && postIds.length > 0) {
-    const { data: likeRows, error: likeErr } = await supabase
-      .from('post_likes')
-      .select('post_id')
-      .eq('user_id', viewer.userId)
-      .in('post_id', postIds)
+    const [likesResult, savesResult] = await Promise.all([
+      supabase
+        .from('post_likes')
+        .select('post_id')
+        .eq('user_id', viewer.userId)
+        .in('post_id', postIds),
+      supabase
+        .from('post_saves')
+        .select('post_id')
+        .eq('user_id', viewer.userId)
+        .in('post_id', postIds),
+    ])
+
+    const { data: likeRows, error: likeErr } = likesResult
     if (!likeErr && likeRows) {
       likedIds = new Set(
         likeRows.map((r) => r.post_id).filter(Boolean) as string[],
       )
     } else if (likeErr && !isMissingPostLikesTable(likeErr.message)) {
-      console.error('getFeedPosts post_likes:', likeErr.message)
+      console.error('queryFeedPosts post_likes:', likeErr.message)
     }
 
-    const { data: saveRows, error: saveErr } = await supabase
-      .from('post_saves')
-      .select('post_id')
-      .eq('user_id', viewer.userId)
-      .in('post_id', postIds)
+    const { data: saveRows, error: saveErr } = savesResult
     if (!saveErr && saveRows) {
       savedIds = new Set(
         saveRows.map((r) => r.post_id).filter(Boolean) as string[],
       )
     } else if (saveErr && !isMissingPostSavesTable(saveErr.message)) {
-      console.error('getFeedPosts post_saves:', saveErr.message)
+      console.error('queryFeedPosts post_saves:', saveErr.message)
     }
   }
 
@@ -128,8 +139,23 @@ export async function getFeedPosts(
       savedByViewer: viewer?.userId ? savedIds.has(id) : false,
       caption,
       timeAgo: formatPostTime(createdAt),
-      avatarSrc: path ? getPostImagePublicUrl(path) : undefined,
+      avatarSrc: path?.trim()
+        ? getPostImagePublicUrl(path.trim()) || undefined
+        : undefined,
       imagePriority: index === 0,
     }
   })
+}
+
+export async function getFeedPosts(
+  viewer?: FeedViewerContext | null,
+): Promise<FeedPostData[]> {
+  return queryFeedPosts({ viewer, limit: 100 })
+}
+
+export async function getPostsForUserId(
+  authorUserId: string,
+  viewer?: FeedViewerContext | null,
+): Promise<FeedPostData[]> {
+  return queryFeedPosts({ viewer, authorUserId, limit: 60 })
 }

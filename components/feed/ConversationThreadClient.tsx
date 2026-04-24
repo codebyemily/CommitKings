@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
+import { sendDirectMessageAction } from '@/app/actions/messages'
 import { decodeSharedPostMessage } from '@/lib/messages/share'
 import type { DirectMessageRow } from '@/lib/messages/types'
 import { getPostImagePublicUrl } from '@/lib/posts/public-url'
@@ -12,17 +13,15 @@ type Props = {
   conversationId: string
   currentUserId: string
   peerDisplayName: string
+  peerUsername: string
   peerAvatarPath: string | null
   initialMessages: DirectMessageRow[]
 }
 
 function avatarSrc(path: string | null): string | null {
   if (!path?.trim()) return null
-  try {
-    return getPostImagePublicUrl(path.trim())
-  } catch {
-    return null
-  }
+  const url = getPostImagePublicUrl(path.trim())
+  return url || null
 }
 
 function formatMsgTime(iso: string): string {
@@ -34,6 +33,7 @@ export function ConversationThreadClient({
   conversationId,
   currentUserId,
   peerDisplayName,
+  peerUsername,
   peerAvatarPath,
   initialMessages,
 }: Props) {
@@ -88,29 +88,14 @@ export function ConversationThreadClient({
     if (!text || sending) return
     setSendError(null)
     setSending(true)
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('direct_messages')
-      .insert({
-        conversation_id: conversationId,
-        sender_id: currentUserId,
-        body: text,
-      })
-      .select('id, conversation_id, sender_id, body, created_at')
-      .single()
 
     setSending(false)
-    if (error) {
-      setSendError(error.message)
+    const result = await sendDirectMessageAction({ conversationId, body: text })
+    if (!result.ok) {
+      setSendError(result.error)
       return
     }
-    if (data) {
-      setBody('')
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === data.id)) return prev
-        return [...prev, data as DirectMessageRow]
-      })
-    }
+    setBody('')
   }
 
   const onSubmitForm = (e: React.FormEvent) => {
@@ -127,7 +112,10 @@ export function ConversationThreadClient({
         <Link href="/messages" className="feed-msg-back">
           ← Messages
         </Link>
-        <div className="feed-msg-thread-peer">
+        <Link
+          href={`/u/${encodeURIComponent(peerUsername)}`}
+          className="feed-msg-thread-peer feed-msg-thread-peer-link"
+        >
           {peerSrc ? (
             <Image
               src={peerSrc}
@@ -143,7 +131,7 @@ export function ConversationThreadClient({
             </span>
           )}
           <span className="feed-msg-thread-name">{peerDisplayName}</span>
-        </div>
+        </Link>
       </header>
 
       <div className="feed-msg-scroll" role="log" aria-live="polite">
@@ -163,14 +151,30 @@ export function ConversationThreadClient({
                     {sharedPost ? (
                       <div>
                         <p className="feed-msg-text">Shared a post</p>
-                        <Image
-                          src={sharedPost.imageSrc}
-                          alt={sharedPost.caption ? sharedPost.caption.slice(0, 120) : 'Shared post'}
-                          width={220}
-                          height={220}
-                          className="feed-msg-shared-image"
-                          unoptimized
-                        />
+                        {sharedPost.imageSrc ? (
+                          <Image
+                            src={sharedPost.imageSrc}
+                            alt={
+                              sharedPost.caption
+                                ? sharedPost.caption.slice(0, 120)
+                                : 'Shared post'
+                            }
+                            width={220}
+                            height={220}
+                            className="feed-msg-shared-image"
+                            unoptimized
+                          />
+                        ) : (
+                          <div
+                            className="feed-msg-shared-image feed-msg-shared-image-placeholder"
+                            role="img"
+                            aria-label={
+                              sharedPost.caption
+                                ? sharedPost.caption.slice(0, 120)
+                                : 'Shared post'
+                            }
+                          />
+                        )}
                         <p className="feed-msg-text">
                           <strong>@{sharedPost.authorUsername}</strong> {sharedPost.caption}
                         </p>

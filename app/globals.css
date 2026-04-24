@@ -389,6 +389,42 @@ button.auth-link:hover {
   text-align: center;
 }
 
+.feed-search-results {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.feed-search-hit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--feed-border);
+  text-decoration: none;
+  color: inherit;
+}
+
+.feed-search-hit-row:last-child {
+  border-bottom: none;
+}
+
+.feed-search-hit-row:active {
+  opacity: 0.85;
+}
+
+.feed-search-hit-handle {
+  margin: 2px 0 0;
+  font-size: 0.875rem;
+  color: var(--feed-muted);
+}
+
+.feed-search-hit-action {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: #3b82f6;
+}
+
 /* Direct messages */
 .feed-msg-start {
   padding: 12px 16px 8px;
@@ -585,6 +621,22 @@ button.auth-link:hover {
   gap: 10px;
 }
 
+a.feed-msg-thread-peer-link {
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+  border-radius: 8px;
+}
+
+a.feed-msg-thread-peer-link:hover {
+  opacity: 0.9;
+}
+
+a.feed-msg-thread-peer-link:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .feed-msg-thread-avatar {
   width: 36px;
   height: 36px;
@@ -662,6 +714,14 @@ button.auth-link:hover {
   margin: 8px 0;
   border-radius: 10px;
   object-fit: cover;
+}
+
+.feed-msg-shared-image-placeholder {
+  min-height: 120px;
+  max-width: 220px;
+  margin: 8px 0;
+  border-radius: 10px;
+  background: #e5e7eb;
 }
 
 .feed-msg-meta {
@@ -787,6 +847,21 @@ html:not([data-theme]) .feed-msg-btn-secondary {
   min-width: 0;
 }
 
+a.feed-post-user-link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+}
+
+a.feed-post-user-link:hover {
+  opacity: 0.9;
+}
+
+a.feed-post-user-link:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .feed-avatar {
   border-radius: 50%;
   object-fit: cover;
@@ -824,6 +899,12 @@ html:not([data-theme]) .feed-msg-btn-secondary {
 
 .feed-post-image {
   object-fit: cover;
+}
+
+.feed-post-media-placeholder {
+  position: absolute;
+  inset: 0;
+  background: #e5e7eb;
 }
 
 .feed-post-body {
@@ -869,6 +950,20 @@ html:not([data-theme]) .feed-msg-btn-secondary {
 
 .feed-caption-text {
   font-weight: 400;
+}
+
+a.feed-profile-author-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+a.feed-profile-author-link:hover {
+  opacity: 0.88;
+}
+
+a.feed-profile-author-link:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .feed-view-comments {
@@ -1312,9 +1407,42 @@ html[data-theme="light"] body {
 }
 
 .profile-handle {
-  margin: 0 0 12px;
+  margin: 0 0 6px;
   font-size: 0.9375rem;
   color: var(--feed-muted);
+}
+
+.profile-follow-stats {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--feed-text);
+}
+
+.profile-follow-stats-num {
+  font-weight: 800;
+}
+
+.profile-follow-stats-sep {
+  margin: 0 6px;
+  color: var(--feed-muted);
+  font-weight: 400;
+}
+
+.profile-friends-count {
+  margin: 0 0 12px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--feed-text);
+}
+
+.profile-friends-count-num {
+  font-weight: 800;
+  margin-right: 4px;
+}
+
+.profile-friends-count-label {
+  font-weight: 600;
 }
 
 .profile-bio {
@@ -1632,6 +1760,252 @@ html[data-theme="dark"] .profile-card {
   color: var(--feed-muted);
 }
 
+.profile-diag-pre {
+  margin: 8px 0 0;
+  padding: 8px;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  overflow: auto;
+  max-height: 200px;
+  background: var(--feed-bg);
+  border: 1px solid var(--feed-border);
+  border-radius: 6px;
+}
+
+/* Public user profile (/u/[username]) */
+.user-public-hero {
+  padding: 16px 16px 20px;
+  text-align: center;
+}
+
+.user-public-bio {
+  margin: 12px auto 0;
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--feed-text);
+  text-align: center;
+}
+
+.user-public-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.user-public-follow-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-public-inline-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #b91c1c;
+  max-width: 16rem;
+  text-align: center;
+}
+
+.user-public-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 7.5rem;
+  padding: 10px 18px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 8px;
+  border: 1px solid var(--feed-border);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.user-public-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.user-public-btn--primary {
+  color: #fff;
+  background: #3b82f6;
+  border-color: #2563eb;
+}
+
+.user-public-btn--primary:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.user-public-btn--secondary {
+  color: var(--feed-text);
+  background: #fafafa;
+}
+
+.user-public-btn--secondary:hover {
+  background: #f3f4f6;
+}
+
+.user-public-btn--following {
+  color: var(--feed-text);
+  background: #fafafa;
+  border-color: var(--feed-border);
+}
+
+.user-public-btn--following:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.user-public-btn--friends {
+  color: var(--feed-text);
+  background: #fafafa;
+  border-color: var(--feed-border);
+}
+
+.user-public-btn--friends:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.user-public-btn--requested {
+  color: var(--feed-muted);
+  background: #fafafa;
+  border-color: var(--feed-border);
+}
+
+.user-public-btn--requested:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.follow-requests-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0 16px 24px;
+}
+
+.follow-requests-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--feed-border);
+}
+
+.follow-requests-row:last-child {
+  border-bottom: none;
+}
+
+.follow-requests-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+}
+
+.follow-requests-user:hover {
+  opacity: 0.92;
+}
+
+.follow-requests-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.follow-requests-btn {
+  min-width: 5.5rem;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+}
+
+.following-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0 12px 24px;
+}
+
+.following-list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--feed-border);
+}
+
+.following-list-row:last-child {
+  border-bottom: none;
+}
+
+.following-list-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+}
+
+.following-list-main:hover {
+  opacity: 0.92;
+}
+
+.following-list-counts {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  color: var(--feed-muted);
+}
+
+.following-list-counts-sep {
+  margin: 0 6px;
+}
+
+.following-list-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.following-list-unfollow {
+  min-width: 6.5rem;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+}
+
+.following-list-row-error {
+  max-width: 11rem;
+  text-align: right;
+}
+
+.user-public-posts {
+  padding: 8px 0 24px;
+}
+
+.user-public-posts-title {
+  margin: 0 16px 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--feed-text);
+}
+
 .profile-segment {
   display: flex;
   gap: 0;
@@ -1801,6 +2175,14 @@ html[data-theme="dark"] .profile-card {
   object-fit: cover;
 }
 
+.activity-post-thumb-placeholder {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  background: #e5e7eb;
+}
+
 .activity-post-copy {
   min-width: 0;
 }
@@ -1868,6 +2250,28 @@ html[data-theme="dark"] .profile-card {
 
 .profile-link-row:hover {
   text-decoration: underline;
+}
+
+.profile-notification-btn {
+  border: 1px solid var(--feed-border);
+  border-radius: 999px;
+  background: var(--feed-bg);
+  color: var(--feed-text);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  min-width: 90px;
+  cursor: pointer;
+}
+
+.profile-notification-btn:hover:not(:disabled) {
+  background: var(--feed-bg-soft);
+}
+
+.profile-notification-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .profile-card-signout {

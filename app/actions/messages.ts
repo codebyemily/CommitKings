@@ -7,6 +7,7 @@ import {
   orderedPair,
 } from '@/lib/data/messages'
 import { encodeSharedPostMessage } from '@/lib/messages/share'
+import { sendOneSignalPushToExternalUsers } from '@/lib/notifications/onesignal'
 import { revalidatePath } from 'next/cache'
 
 export type MessageActionResult =
@@ -18,6 +19,61 @@ export type ShareConversationItem = {
   peerDisplayName: string
   peerUsername: string
   peerAvatarPath: string | null
+}
+
+async function insertDirectMessageAndNotify(input: {
+  conversationId: string
+  senderId: string
+  body: string
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient()
+  const { data: conv, error: convErr } = await supabase
+    .from('direct_conversations')
+    .select('id, user_low, user_high')
+    .eq('id', input.conversationId)
+    .maybeSingle()
+
+  if (convErr || !conv) {
+    return { ok: false, error: convErr?.message ?? 'Conversation not found.' }
+  }
+
+  if (conv.user_low !== input.senderId && conv.user_high !== input.senderId) {
+    return { ok: false, error: 'You cannot message this conversation.' }
+  }
+
+  const { error } = await supabase.from('direct_messages').insert({
+    conversation_id: input.conversationId,
+    sender_id: input.senderId,
+    body: input.body,
+  })
+
+  if (error) {
+    return { ok: false, error: error.message }
+  }
+
+  const recipientId = conv.user_low === input.senderId ? conv.user_high : conv.user_low
+  const { data: senderProfile } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', input.senderId)
+    .maybeSingle()
+  const username =
+    typeof senderProfile?.username === 'string' && senderProfile.username.trim()
+      ? senderProfile.username.trim()
+      : 'user'
+  const preview =
+    input.body.length > 90 ? `${input.body.slice(0, 90)}...` : input.body
+  const pushResult = await sendOneSignalPushToExternalUsers({
+    externalUserIds: [recipientId],
+    headings: 'New message',
+    contents: `@${username}: ${preview}`,
+    url: `/messages/${input.conversationId}`,
+  })
+  if (!pushResult.ok) {
+    console.error('OneSignal message notification failed:', pushResult.error)
+  }
+
+  return { ok: true }
 }
 
 export async function getOrCreateConversationWithUser(
@@ -114,15 +170,12 @@ export async function sharePostToUsername(input: {
     imageSrc: input.imageSrc,
   })
 
-  const { error } = await supabase.from('direct_messages').insert({
-    conversation_id: conv.conversationId,
-    sender_id: user.id,
+  const sent = await insertDirectMessageAndNotify({
+    conversationId: conv.conversationId,
+    senderId: user.id,
     body,
   })
-
-  if (error) {
-    return { ok: false, error: error.message }
-  }
+  if (!sent.ok) return sent
 
   revalidatePath('/messages')
   revalidatePath(`/messages/${conv.conversationId}`)
@@ -176,19 +229,6 @@ export async function sharePostToConversation(input: {
     return { ok: false, error: 'You must be signed in.' }
   }
 
-  const { data: conv, error: convErr } = await supabase
-    .from('direct_conversations')
-    .select('id, user_low, user_high')
-    .eq('id', conversationId)
-    .maybeSingle()
-
-  if (convErr || !conv) {
-    return { ok: false, error: convErr?.message ?? 'Conversation not found.' }
-  }
-  if (conv.user_low !== user.id && conv.user_high !== user.id) {
-    return { ok: false, error: 'You cannot share to this conversation.' }
-  }
-
   const body = encodeSharedPostMessage({
     postId: input.postId,
     authorUsername: input.authorUsername,
@@ -196,14 +236,46 @@ export async function sharePostToConversation(input: {
     imageSrc: input.imageSrc,
   })
 
-  const { error } = await supabase.from('direct_messages').insert({
-    conversation_id: conversationId,
-    sender_id: user.id,
+  const sent = await insertDirectMessageAndNotify({
+    conversationId: conversationId,
+    senderId: user.id,
     body,
   })
+  if (!sent.ok) return sent
 
-  if (error) {
-    return { ok: false, error: error.message }
+  revalidatePath('/messages')
+  revalidatePath(`/messages/${conversationId}`)
+  return { ok: true, conversationId }
+}
+
+export async function sendDirectMessageAction(input: {
+  conversationId: string
+  body: string
+}): Promise<MessageActionResult> {
+  const conversationId = input.conversationId.trim()
+  const text = input.body.trim()
+  if (!conversationId) {
+    return { ok: false, error: 'Invalid conversation.' }
+  }
+  if (!text || text.length > 4000) {
+    return { ok: false, error: 'Message must be 1-4000 characters.' }
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { ok: false, error: 'You must be signed in.' }
+  }
+
+  const sent = await insertDirectMessageAndNotify({
+    conversationId,
+    senderId: user.id,
+    body: text,
+  })
+  if (!sent.ok) {
+    return sent
   }
 
   revalidatePath('/messages')

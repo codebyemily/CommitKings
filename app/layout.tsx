@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import OneSignalInit from '@/components/notifications/OneSignalInit'
 
 export const metadata: Metadata = {
   title: {
@@ -8,8 +9,8 @@ export const metadata: Metadata = {
   },
   description: 'Forum Neighborhood app',
   icons: {
-    icon: [{ url: '/1058031.svg', type: 'image/svg+xml' }],
-    apple: '/1058031.svg',
+    icon: [{ url: '/logo.svg', type: 'image/svg+xml' }],
+    apple: '/logo.svg',
   },
 }
 
@@ -20,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <OneSignalInit />
+        {children}
+      </body>
     </html>
   )
 }

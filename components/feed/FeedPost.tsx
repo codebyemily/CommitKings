@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { FeedPostEngagement } from './FeedPostEngagement'
 
 export type FeedPostData = {
@@ -36,12 +37,13 @@ export function FeedPost({
 }: FeedPostData) {
   const showHeader = Boolean(timeAgo)
   const authorLabel = displayName || username
+  const profileHref = `/u/${encodeURIComponent(username)}`
 
   return (
     <article className="feed-post">
       {showHeader ? (
         <div className="feed-post-header">
-          <div className="feed-post-user">
+          <Link href={profileHref} className="feed-post-user feed-post-user-link">
             {avatarSrc ? (
               <Image
                 src={avatarSrc}
@@ -56,20 +58,28 @@ export function FeedPost({
               </span>
             )}
             <span className="feed-username">{authorLabel}</span>
-          </div>
+          </Link>
           <span className="feed-time">{timeAgo}</span>
         </div>
       ) : null}
 
       <div className="feed-post-media">
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          fill
-          sizes="100vw"
-          className="feed-post-image"
-          priority={imagePriority ?? false}
-        />
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            fill
+            sizes="100vw"
+            className="feed-post-image"
+            priority={imagePriority ?? false}
+          />
+        ) : (
+          <div
+            className="feed-post-media-placeholder"
+            role="img"
+            aria-label={imageAlt}
+          />
+        )}
       </div>
 
       <FeedPostEngagement

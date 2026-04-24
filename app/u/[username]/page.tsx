@@ -38,8 +38,9 @@ export default async function PublicUserProfilePage({ params }: Props) {
 
   const supabase = await createClient()
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
+  const user = session?.user ?? null
 
   if (!user) {
     redirect('/login')
@@ -62,22 +63,18 @@ export default async function PublicUserProfilePage({ params }: Props) {
       viewerProfile.avatar_path.trim()) ||
     (typeof meta?.avatar_path === 'string' ? meta.avatar_path.trim() : '')
 
-  const posts = await getPostsForUserId(profile.id, {
-    userId: user.id,
-    avatarStoragePath: avatarPathRaw || null,
-  })
-
-  const initialFriends =
-    profile.id === user.id
-      ? false
-      : await viewerFriendsWithUser(user.id, profile.id)
-
-  const initialOutgoingRequest =
-    profile.id === user.id
-      ? false
-      : await viewerOutgoingFollowRequest(user.id, profile.id)
-
-  const friendsCount = await getMutualFriendsCount(profile.id)
+  const [posts, initialFriends, initialOutgoingRequest, friendsCount] =
+    await Promise.all([
+      getPostsForUserId(profile.id, {
+        userId: user.id,
+        avatarStoragePath: avatarPathRaw || null,
+      }),
+      profile.id === user.id ? Promise.resolve(false) : viewerFriendsWithUser(user.id, profile.id),
+      profile.id === user.id
+        ? Promise.resolve(false)
+        : viewerOutgoingFollowRequest(user.id, profile.id),
+      getMutualFriendsCount(profile.id),
+    ])
 
   return (
     <UserPublicProfileScreen

@@ -64,11 +64,20 @@ async function queryFeedPosts(options: FeedQueryOptions): Promise<FeedPostData[]
   let likedIds = new Set<string>()
   let savedIds = new Set<string>()
   if (viewer?.userId && postIds.length > 0) {
-    const { data: likeRows, error: likeErr } = await supabase
-      .from('post_likes')
-      .select('post_id')
-      .eq('user_id', viewer.userId)
-      .in('post_id', postIds)
+    const [likesResult, savesResult] = await Promise.all([
+      supabase
+        .from('post_likes')
+        .select('post_id')
+        .eq('user_id', viewer.userId)
+        .in('post_id', postIds),
+      supabase
+        .from('post_saves')
+        .select('post_id')
+        .eq('user_id', viewer.userId)
+        .in('post_id', postIds),
+    ])
+
+    const { data: likeRows, error: likeErr } = likesResult
     if (!likeErr && likeRows) {
       likedIds = new Set(
         likeRows.map((r) => r.post_id).filter(Boolean) as string[],
@@ -77,11 +86,7 @@ async function queryFeedPosts(options: FeedQueryOptions): Promise<FeedPostData[]
       console.error('queryFeedPosts post_likes:', likeErr.message)
     }
 
-    const { data: saveRows, error: saveErr } = await supabase
-      .from('post_saves')
-      .select('post_id')
-      .eq('user_id', viewer.userId)
-      .in('post_id', postIds)
+    const { data: saveRows, error: saveErr } = savesResult
     if (!saveErr && saveRows) {
       savedIds = new Set(
         saveRows.map((r) => r.post_id).filter(Boolean) as string[],

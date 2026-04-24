@@ -1,75 +1,92 @@
-# React + TypeScript + Vite
+# Forum Neighborhood
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Forum Neighborhood is a social-style community app built with Next.js (App Router), React, TypeScript, and Supabase.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Email/password auth flow (login, signup, forgot/reset password)
+- Home feed with likes, saves, comments count, and profile avatars
+- Profiles and public user pages
+- Direct messages
+- Friend/follow system with incoming requests
+- Activity feed and search
+- Optional push notifications via OneSignal
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- Next.js 15
+- React 19
+- TypeScript
+- Supabase (`@supabase/supabase-js`, `@supabase/ssr`)
 
-Note: This will impact Vite dev & build performances.
+## Project Structure
 
-## Expanding the ESLint configuration
+- `app/` - App Router routes, server actions, API routes
+- `components/` - UI components for feed, profile, auth, activity, notifications
+- `lib/` - Supabase clients, data-access helpers, notification helpers
+- `public/` - Static assets, OneSignal service workers
+- `scripts/` - Project scripts (for example DB migration helpers)
+- `react-ts/` - Legacy/secondary frontend workspace (separate from the main Next.js app)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Requirements
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 18+ (Node.js 20+ recommended)
+- npm
+- A Supabase project
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Environment Variables
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Create a `.env.local` file in the project root:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+# Optional alias used in some code paths:
+# NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+
+# Optional (for push notifications):
+NEXT_PUBLIC_ONESIGNAL_APP_ID=...
+ONESIGNAL_REST_API_KEY=...
+
+# Optional (for service-role operations):
+SUPABASE_SERVICE_ROLE_KEY=...
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Install dependencies:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+Run development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Available Scripts
+
+- `npm run dev` - start Next.js in development mode
+- `npm run build` - create production build in `.next/`
+- `npm run start` - run production server from `.next/`
+- `npm run lint` - run ESLint
+- `npm run db:apply-engagement` - run engagement migration helper script
+
+## Production Run (Local)
+
+To test production behavior locally:
+
+```bash
+npm run build
+npm run start
+```
+
+## Notes
+
+- `.next/` is build output and is git-ignored by default.
+- Middleware enforces auth redirects for protected routes.
+- If OneSignal env vars are missing, notification initialization is skipped.

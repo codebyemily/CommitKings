@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/favicon.ico',
-        destination: '/1058031.svg',
+        destination: '/logo.svg',
         permanent: true,
       },
     ]

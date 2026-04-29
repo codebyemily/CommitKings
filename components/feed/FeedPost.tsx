@@ -1,9 +1,13 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { FeedPostEngagement } from './FeedPostEngagement'
+import { useState } from 'react'
 
 export type FeedPostData = {
   id: string
+  authorUserId: string
   username: string
   displayName: string
   imageSrc: string
@@ -22,6 +26,7 @@ export type FeedPostData = {
 
 export function FeedPost({
   id,
+  authorUserId,
   username,
   displayName,
   imageSrc,
@@ -35,6 +40,9 @@ export function FeedPost({
   avatarSrc,
   imagePriority,
 }: FeedPostData) {
+  const [isDeleted, setIsDeleted] = useState(false)
+  if (isDeleted) return null
+
   const showHeader = Boolean(timeAgo)
   const authorLabel = displayName || username
   const profileHref = `/u/${encodeURIComponent(username)}`
@@ -84,6 +92,7 @@ export function FeedPost({
 
       <FeedPostEngagement
         postId={id}
+        authorUserId={authorUserId}
         captionAuthorLabel={authorLabel}
         shareAuthorUsername={username}
         caption={caption}
@@ -92,6 +101,7 @@ export function FeedPost({
         initialLiked={likedByViewer}
         initialSaved={savedByViewer}
         initialCommentsCount={commentsCount}
+        onDeleted={() => setIsDeleted(true)}
       />
     </article>
   )

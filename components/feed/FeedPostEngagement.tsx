@@ -2,6 +2,8 @@
 
 import {
   addPostCommentAction,
+  deleteOwnCommentAction,
+  deleteOwnPostAction,
   togglePostSaveAction,
   togglePostLikeAction,
 } from '@/app/actions/post-engagement'
@@ -20,10 +22,11 @@ import {
 } from './FeedIcons'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export type CommentRow = {
   id: string
+  user_id: string
   body: string
   created_at: string
   author_username: string
@@ -32,6 +35,7 @@ export type CommentRow = {
 
 type Props = {
   postId: string
+  authorUserId: string
   captionAuthorLabel: string
   shareAuthorUsername: string
   caption: string
@@ -40,6 +44,7 @@ type Props = {
   initialLiked: boolean
   initialSaved: boolean
   initialCommentsCount: number
+  onDeleted?: () => void
 }
 
 function formatCommentTime(iso: string): string {
@@ -64,6 +69,7 @@ function peerAvatarSrc(path: string | null): string | null {
 
 export function FeedPostEngagement({
   postId,
+  authorUserId,
   captionAuthorLabel,
   shareAuthorUsername,
   caption,
@@ -72,6 +78,7 @@ export function FeedPostEngagement({
   initialLiked,
   initialSaved,
   initialCommentsCount,
+  onDeleted,
 }: Props) {
   const [likesCount, setLikesCount] = useState(initialLikesCount)
   const [liked, setLiked] = useState(initialLiked)
@@ -94,6 +101,17 @@ export function FeedPostEngagement({
     null,
   )
   const [shareError, setShareError] = useState<string | null>(null)
+  const [viewerUserId, setViewerUserId] = useState<string | null>(null)
+  const [deletePostPending, setDeletePostPending] = useState(false)
+  const [deleteCommentIdPending, setDeleteCommentIdPending] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    void supabase.auth.getUser().then(({ data }) => {
+      setViewerUserId(data.user?.id ?? null)
+    })
+  }, [])
 
   const loadComments = useCallback(async () => {
     setCommentsLoading(true)
@@ -101,7 +119,7 @@ export function FeedPostEngagement({
     const { data, error } = await supabase
       .from('post_comments')
       .select(
-        'id, body, created_at, author_username, author_display_name',
+        'id, user_id, body, created_at, author_username, author_display_name',
       )
       .eq('post_id', postId)
       .order('created_at', { ascending: true })
@@ -212,6 +230,37 @@ export function FeedPostEngagement({
     })
   }
 
+  const onDeleteOwnPost = () => {
+    if (deletePostPending) return
+    setDeleteError(null)
+    setDeletePostPending(true)
+    void deleteOwnPostAction(postId).then((r) => {
+      setDeletePostPending(false)
+      if (!r.ok) {
+        setDeleteError(r.error)
+        return
+      }
+      onDeleted?.()
+    })
+  }
+
+  const onDeleteOwnComment = (commentId: string) => {
+    if (deleteCommentIdPending) return
+    setDeleteError(null)
+    setDeleteCommentIdPending(commentId)
+    void deleteOwnCommentAction(commentId).then((r) => {
+      setDeleteCommentIdPending(null)
+      if (!r.ok) {
+        setDeleteError(r.error)
+        return
+      }
+      setComments((rows) => rows.filter((c) => c.id !== commentId))
+      setCommentsCount((n) => Math.max(0, n - 1))
+    })
+  }
+
+  const canDeletePost = Boolean(viewerUserId && viewerUserId === authorUserId)
+
   return (
     <div className="feed-post-body">
       <div className="feed-actions">
@@ -272,6 +321,11 @@ export function FeedPostEngagement({
           {shareError}
         </p>
       ) : null}
+      {deleteError ? (
+        <p className="feed-like-error" role="alert">
+          {deleteError}
+        </p>
+      ) : null}
 
       <p className="feed-likes">
         {likesCount === 1 ? '1 like' : `${likesCount.toLocaleString()} likes`}
@@ -290,6 +344,16 @@ export function FeedPostEngagement({
         )}{' '}
         <span className="feed-caption-text">{caption}</span>
       </p>
+      {canDeletePost ? (
+        <button
+          type="button"
+          className="feed-view-comments"
+          onClick={onDeleteOwnPost}
+          disabled={deletePostPending}
+        >
+          {deletePostPending ? 'Deleting post…' : 'Delete post'}
+        </button>
+      ) : null}
 
       {commentsCount > 0 && !commentsSheetOpen ? (
         <button
@@ -349,6 +413,16 @@ export function FeedPostEngagement({
                       )}{' '}
                       <span className="feed-comment-body">{c.body}</span>
                       <span className="feed-comment-time">{formatCommentTime(c.created_at)}</span>
+                      {viewerUserId && c.user_id === viewerUserId ? (
+                        <button
+                          type="button"
+                          className="feed-view-comments"
+                          onClick={() => onDeleteOwnComment(c.id)}
+                          disabled={deleteCommentIdPending === c.id}
+                        >
+                          {deleteCommentIdPending === c.id ? 'Deleting…' : 'Delete'}
+                        </button>
+                      ) : null}
                     </li>
                   ))}
                 </ul>

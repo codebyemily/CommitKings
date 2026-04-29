@@ -4,11 +4,9 @@ export function formatPostTime(iso: string): string {
 
   const diffMs = Date.now() - d.getTime()
 
-  // Future timestamps: negative relative deltas would read wrong (e.g. "-5s ago").
+  // Guard future timestamps caused by clock skew: never render a future date.
   if (diffMs < 0) {
-    const skewMs = 120_000
-    if (diffMs > -skewMs) return 'just now'
-    return d.toISOString().slice(0, 10)
+    return 'just now'
   }
 
   const sec = Math.floor(diffMs / 1000)

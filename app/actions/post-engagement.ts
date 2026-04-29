@@ -15,6 +15,7 @@ export type AddCommentResult =
       ok: true
       comment: {
         id: string
+        user_id: string
         body: string
         created_at: string
         author_username: string
@@ -26,6 +27,9 @@ export type AddCommentResult =
 export type ToggleSaveResult =
   | { ok: true; saved: boolean }
   | { ok: false; error: string }
+
+export type DeletePostResult = { ok: true } | { ok: false; error: string }
+export type DeleteCommentResult = { ok: true } | { ok: false; error: string }
 
 export async function togglePostLikeAction(postId: string): Promise<ToggleLikeResult> {
   const trimmed = postId.trim()
@@ -147,7 +151,7 @@ export async function addPostCommentAction(
       author_display_name: displayName,
       body: text,
     })
-    .select('id, body, created_at, author_username, author_display_name')
+    .select('id, user_id, body, created_at, author_username, author_display_name')
     .single()
 
   if (error || !row) {
@@ -183,6 +187,7 @@ export async function addPostCommentAction(
     ok: true,
     comment: {
       id: row.id,
+      user_id: row.user_id,
       body: row.body,
       created_at: row.created_at,
       author_username: row.author_username,
@@ -244,4 +249,83 @@ export async function togglePostSaveAction(postId: string): Promise<ToggleSaveRe
   revalidatePath('/home')
   revalidatePath('/activity?tab=saved')
   return { ok: true, saved: !existing }
+}
+
+export async function deleteOwnPostAction(postId: string): Promise<DeletePostResult> {
+  const trimmed = postId.trim()
+  if (!trimmed) return { ok: false, error: 'Invalid post.' }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  const { data: post, error: postError } = await supabase
+    .from('posts')
+    .select('user_id, image_path')
+    .eq('id', trimmed)
+    .maybeSingle()
+
+  if (postError || !post) {
+    return {
+      ok: false,
+      error: engagementSchemaErrorMessage(postError?.message ?? 'Post not found.'),
+    }
+  }
+  if (post.user_id !== user.id) {
+    return { ok: false, error: 'You can only delete your own posts.' }
+  }
+
+  const { error: deleteError } = await supabase.from('posts').delete().eq('id', trimmed)
+  if (deleteError) {
+    return { ok: false, error: engagementSchemaErrorMessage(deleteError.message) }
+  }
+
+  const imagePath = typeof post.image_path === 'string' ? post.image_path.trim() : ''
+  if (imagePath) {
+    await supabase.storage.from('post-images').remove([imagePath])
+  }
+
+  revalidatePath('/home')
+  revalidatePath('/profile')
+  return { ok: true }
+}
+
+export async function deleteOwnCommentAction(commentId: string): Promise<DeleteCommentResult> {
+  const trimmed = commentId.trim()
+  if (!trimmed) return { ok: false, error: 'Invalid comment.' }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  const { data: comment, error: commentError } = await supabase
+    .from('post_comments')
+    .select('user_id')
+    .eq('id', trimmed)
+    .maybeSingle()
+
+  if (commentError || !comment) {
+    return {
+      ok: false,
+      error: engagementSchemaErrorMessage(commentError?.message ?? 'Comment not found.'),
+    }
+  }
+  if (comment.user_id !== user.id) {
+    return { ok: false, error: 'You can only delete your own comments.' }
+  }
+
+  const { error: deleteError } = await supabase
+    .from('post_comments')
+    .delete()
+    .eq('id', trimmed)
+  if (deleteError) {
+    return { ok: false, error: engagementSchemaErrorMessage(deleteError.message) }
+  }
+
+  revalidatePath('/home')
+  return { ok: true }
 }

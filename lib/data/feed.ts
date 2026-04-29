@@ -129,6 +129,7 @@ async function queryFeedPosts(options: FeedQueryOptions): Promise<FeedPostData[]
 
     return {
       id,
+      authorUserId: String(row.user_id ?? ''),
       username: authorUsername,
       displayName: authorDisplayName,
       imageSrc: getPostImagePublicUrl(imagePath),

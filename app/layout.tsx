@@ -19,8 +19,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const themeInitScript = `
+    (function () {
+      try {
+        var key = 'forum-neighborhood-theme';
+        var value = localStorage.getItem(key);
+        var root = document.documentElement;
+        if (value === 'dark' || value === 'light') {
+          root.setAttribute('data-theme', value);
+        } else {
+          root.removeAttribute('data-theme');
+        }
+      } catch (e) {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    })();
+  `
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
         <OneSignalInit />
         {children}

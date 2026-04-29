@@ -12,6 +12,9 @@ import {
   useState,
 } from 'react'
 
+const MAX_BYTES = 10 * 1024 * 1024
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+
 export function CreatePostForm() {
   const router = useRouter()
   const galleryInputId = useId()
@@ -140,6 +143,14 @@ export function CreatePostForm() {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file || !file.type.startsWith('image/')) return
+    if (!ALLOWED_TYPES.has(file.type)) {
+      setPostError('Use a JPEG, PNG, WebP, or GIF image.')
+      return
+    }
+    if (file.size > MAX_BYTES) {
+      setPostError('Image must be 10 MB or smaller.')
+      return
+    }
     setUploadFile(file)
     setPreviewUrl((prev) => {
       revokePreview(prev)
@@ -161,20 +172,25 @@ export function CreatePostForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!uploadFile) return
+    if (!uploadFile || submitting) return
     setSubmitting(true)
     setPostError(null)
-    const fd = new FormData()
-    fd.append('image', uploadFile)
-    fd.append('caption', caption)
-    const result = await createPostAction(fd)
-    setSubmitting(false)
-    if (result.ok) {
-      router.push('/home')
-      router.refresh()
-      return
+    try {
+      const fd = new FormData()
+      fd.append('image', uploadFile)
+      fd.append('caption', caption)
+      const result = await createPostAction(fd)
+      if (result.ok) {
+        router.push('/home')
+        router.refresh()
+        return
+      }
+      setPostError(result.error)
+    } catch {
+      setPostError('Could not publish your post. Please try again.')
+    } finally {
+      setSubmitting(false)
     }
-    setPostError(result.error)
   }
 
   return (
